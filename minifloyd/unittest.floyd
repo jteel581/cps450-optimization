@@ -1,0 +1,12 @@
+
+~ previous line tests newline, this line tests comments
+        ~this line tests whitespace and tabs as being ignorred
+boolean begin class else end false from if inherits int is loop me new
+not null string then true while ~ these two lines test keywords
+BEGIN _ident s7j_ ___ ~ this line tests identifiers
+3521 15 -4068 ~ this line tests integer literals
+"Hi, \"Tom\", \nHow are \333things\222 today?" ~ this line tests string literals
+"\t" "\n" "\f" "\r" "\"" "\\" ~ this line tests escape characters
+& + - * / > >= = &+-*/>>== ~ this line tests operators
+:= ( ) [ ] , ; : . :=()[],;:. ~ this line tests miscellaneous characters
+"hello""goodbye" ~ this line tests two strings with no whitepsace between

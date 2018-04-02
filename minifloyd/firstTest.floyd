@@ -1,0 +1,27 @@
+class main is
+	x : int
+	y : boolean
+	z : boolean
+	start() is
+		ab : int
+		begin
+			ab := 20
+			if ab = 20 then
+				ab := 22
+				if ab = 22 then
+					ab := 25
+				end if
+			else
+				ab := 27
+			end if
+			loop while ab > 20
+				ab := ab - 1
+			end loop
+			x := 1 + -ab
+			y := true or false
+			z := y
+			x := in.readint()
+			in.readint()
+			out.writeint(ab)
+		end Start
+	end main

@@ -1,0 +1,41 @@
+~
+~ mytest.floyd
+~ - Errors
+~
+
+class airplane is
+
+                              
+  x: int := 0
+  blah(x: int; y: int) is
+  x: int
+  begin
+  	x := 3 * true
+  	if true then
+  	x := 1
+  	end if
+  	loop while false
+  	x := 2
+  	end loop
+  end blah
+
+  start(a: int; b: boolean) is
+  x: int 
+  y: string
+  z: boolean
+  begin
+  	blah(true, 2)
+    x := -true                  ~ REFERENCE x
+    y := "haha"
+    z := not 1
+  end start
+end airplane
+class bubba is
+	X: int
+	start() is
+	begin
+	readint()
+	writeint(X)
+	X := 1
+	end start
+end bubba
