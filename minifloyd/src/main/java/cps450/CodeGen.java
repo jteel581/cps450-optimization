@@ -16,6 +16,7 @@ import cps450.FloydParser.BbyteFactoidContext;
 import cps450.FloydParser.Call_stmtContext;
 import cps450.FloydParser.ConcatNybbleBbyteContext;
 import cps450.FloydParser.ExprTailExpressionContext;
+import cps450.FloydParser.ExpressionContext;
 import cps450.FloydParser.ExpressionFactoidContext;
 import cps450.FloydParser.FactoidFactorContext;
 import cps450.FloydParser.FactorExpressionContext;
@@ -363,16 +364,77 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		String fullComment = generateComment(ctx);
 		emitComment(fullComment);
 		String methodName = ctx.IDENTIFIER().getText();
+		Integer numParams = ctx.expression_list().exprs.size();
+		Integer paramsSize = numParams * 4;
 		switch (methodName)
 		{
 		case "readint":
 			emit("call", "readint");
 			break;
 		case "writeint": 
-			visit(ctx.expression_list().expression(0));
-			emit("call", "writeint");
-			emit("popl", "%ecx");
+			//visit(ctx.expression_list().expression(0));
+			for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
+			{
+				visit(ctx.expression_list().expression(i));
+			}
+			// ask schaub if this is correct
+			// code to push me goes here
+			//emit("pushl", "%eip");
+			emit("call", methodName);
+			
+			emit("addl","$" + paramsSize, "%esp" );
+			//emit("call", "writeint");
+			//emit("popl", "%ecx");
 			break;
+		default:
+			
+			// call that looks like boo()
+			if (ctx.expression().getText().equals(""))
+			{
+				// if there are params
+				if (!ctx.expression_list().getText().equals(""))
+				{
+					for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
+					{
+						visit(ctx.expression_list().expression(i));
+					}
+					// ask schaub if this is correct
+					// code to push me goes here
+					//emit("pushl", "%eip");
+					emit("call", methodName);
+					
+					emit("addl","$" + paramsSize, "%esp" );
+				}
+				else // no params
+				{
+					//emit("pushl", "%eip");
+					emit("call", methodName);
+				}
+			}
+			// call that looks like foo.boo()
+			else
+			{
+				if (!ctx.expression_list().getText().equals(""))
+				{
+					for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
+					{
+						visit(ctx.expression_list().expression(i));
+					}
+					// code to push foo part of call
+					// ask schaub if this is correct
+					//emit("pushl", "%eip");
+					emit("call", methodName);
+					emit("addl","$" + paramsSize, "%esp" );
+
+				}
+				else // no params
+				{
+					//emit("pushl", "%eip");
+					emit("call", methodName);
+				}
+			}
+			break;
+				
 		}
 		return null;
 	}
@@ -402,6 +464,65 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			visit(ctx.expression_list().expression(0));
 			emit("call", "writeint");
 			emit("popl", "%ecx");
+			break;
+		default:
+			Integer numParams = ctx.expression_list().exprs.size();
+			Integer paramsSize = numParams * 4;
+			// call that looks like boo()
+			NormalExpressionContext ec = (NormalExpressionContext) ctx.getParent();
+			String classReferenced = "";
+			if (ec.IDENTIFIER() != null)
+			{
+				classReferenced = ec.IDENTIFIER().getText();
+			}
+			
+			// if (ctx.parent.getChild(0))
+			if (classReferenced.equals(""))
+			{
+				// if there are params
+				if (!ctx.expression_list().getText().equals(""))
+				{
+					for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
+					{
+						visit(ctx.expression_list().expression(i));
+					}
+					// ask schaub if this is correct
+					// code to push me goes here
+					//emit("pushl", "%eip");
+					emit("call", methodName);
+					
+					emit("addl","$" + paramsSize, "%esp" );
+				}
+				// if there are not params
+				else 
+				{
+					//emit("pushl", "%eip");
+					emit("call", methodName);
+				}
+			}
+			// call that looks like foo.boo()
+			else
+			{
+				// if there are params
+				if (!ctx.expression_list().getText().equals(""))
+				{
+					for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
+					{
+						visit(ctx.expression_list().expression(i));
+					}
+					// code to push foo part of call
+					// ask schaub if this is correct
+					//emit("pushl", "%eip");
+					emit("call", methodName);
+					emit("addl","$" + paramsSize, "%esp" );
+
+				}
+				else
+				{
+					//emit("pushl", "%eip");
+					emit("call", methodName);
+				}
+			}
 			break;
 		}
 		return null;

@@ -5,7 +5,7 @@ class breakit is
   
   start() is
   begin
-  
+
     mov := 12 * in.readint()   ~ Enter 10
     out.writeint(mov)           ~ 120
     

@@ -5,39 +5,42 @@
 writeint:
 .LFB0:
 	.cfi_startproc
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	subq	$96, %rsp
-	movl	%edi, -84(%rbp)
-	movq	%fs:40, %rax
-	movq	%rax, -8(%rbp)
+	pushl	%ebp
+	.cfi_def_cfa_offset 8
+	.cfi_offset 5, -8
+	movl	%esp, %ebp
+	.cfi_def_cfa_register 5
+	pushl	%ebx
+	subl	$68, %esp
+	.cfi_offset 3, -12
+	movl	%gs:20, %eax
+	movl	%eax, -12(%ebp)
 	xorl	%eax, %eax
-	movq	$2608, -32(%rbp)
-	movq	$0, -24(%rbp)
-	movl	$0, -16(%rbp)
-	leaq	-64(%rbp), %rax
-	movq	%rax, -80(%rbp)
-	leaq	-32(%rbp), %rax
-	movq	%rax, -72(%rbp)
-	cmpl	$0, -84(%rbp)
+	movl	$2608, -32(%ebp)
+	movl	$0, -28(%ebp)
+	movl	$0, -24(%ebp)
+	movl	$0, -20(%ebp)
+	movl	$0, -16(%ebp)
+	leal	-52(%ebp), %eax
+	movl	%eax, -60(%ebp)
+	leal	-32(%ebp), %eax
+	movl	%eax, -56(%ebp)
+	cmpl	$0, 8(%ebp)
 	jns	.L2
-	movq	-72(%rbp), %rax
-	leaq	1(%rax), %rdx
-	movq	%rdx, -72(%rbp)
-	movb	$45, (%rax)
-	negl	-84(%rbp)
+	movl	-56(%ebp), %eax
+	leal	1(%eax), %edx
+	movl	%edx, -56(%ebp)
+	movb	$45, (%eax)
+	negl	8(%ebp)
 .L2:
-	cmpl	$0, -84(%rbp)
+	cmpl	$0, 8(%ebp)
 	jle	.L3
 	jmp	.L4
 .L5:
-	movq	-80(%rbp), %rsi
-	leaq	1(%rsi), %rax
-	movq	%rax, -80(%rbp)
-	movl	-84(%rbp), %ecx
+	movl	-60(%ebp), %ebx
+	leal	1(%ebx), %eax
+	movl	%eax, -60(%ebp)
+	movl	8(%ebp), %ecx
 	movl	$1717986919, %edx
 	movl	%ecx, %eax
 	imull	%edx
@@ -53,8 +56,8 @@ writeint:
 	movl	%ecx, %edx
 	movl	%edx, %eax
 	addl	$48, %eax
-	movb	%al, (%rsi)
-	movl	-84(%rbp), %ecx
+	movb	%al, (%ebx)
+	movl	8(%ebp), %ecx
 	movl	$1717986919, %edx
 	movl	%ecx, %eax
 	imull	%edx
@@ -63,62 +66,68 @@ writeint:
 	sarl	$31, %eax
 	subl	%eax, %edx
 	movl	%edx, %eax
-	movl	%eax, -84(%rbp)
+	movl	%eax, 8(%ebp)
 .L4:
-	cmpl	$0, -84(%rbp)
+	cmpl	$0, 8(%ebp)
 	jg	.L5
-	subq	$1, -80(%rbp)
+	subl	$1, -60(%ebp)
 	jmp	.L6
 .L7:
-	movq	-72(%rbp), %rax
-	leaq	1(%rax), %rdx
-	movq	%rdx, -72(%rbp)
-	movq	-80(%rbp), %rdx
-	leaq	-1(%rdx), %rcx
-	movq	%rcx, -80(%rbp)
-	movzbl	(%rdx), %edx
-	movb	%dl, (%rax)
+	movl	-56(%ebp), %eax
+	leal	1(%eax), %edx
+	movl	%edx, -56(%ebp)
+	movl	-60(%ebp), %edx
+	leal	-1(%edx), %ecx
+	movl	%ecx, -60(%ebp)
+	movzbl	(%edx), %edx
+	movb	%dl, (%eax)
 .L6:
-	leaq	-64(%rbp), %rax
-	cmpq	%rax, -80(%rbp)
+	leal	-52(%ebp), %eax
+	cmpl	%eax, -60(%ebp)
 	ja	.L7
-	movq	-72(%rbp), %rax
-	leaq	1(%rax), %rdx
-	movq	%rdx, -72(%rbp)
-	movq	-80(%rbp), %rdx
-	movzbl	(%rdx), %edx
-	movb	%dl, (%rax)
-	movq	-72(%rbp), %rax
-	leaq	1(%rax), %rdx
-	movq	%rdx, -72(%rbp)
-	movb	$10, (%rax)
-	movq	-72(%rbp), %rax
-	leaq	1(%rax), %rdx
-	movq	%rdx, -72(%rbp)
-	movb	$0, (%rax)
+	movl	-56(%ebp), %eax
+	leal	1(%eax), %edx
+	movl	%edx, -56(%ebp)
+	movl	-60(%ebp), %edx
+	movzbl	(%edx), %edx
+	movb	%dl, (%eax)
+	movl	-56(%ebp), %eax
+	leal	1(%eax), %edx
+	movl	%edx, -56(%ebp)
+	movb	$10, (%eax)
+	movl	-56(%ebp), %eax
+	leal	1(%eax), %edx
+	movl	%edx, -56(%ebp)
+	movb	$0, (%eax)
 	jmp	.L8
 .L3:
-	leaq	-32(%rbp), %rax
-	addq	$3, %rax
-	movq	%rax, -72(%rbp)
+	leal	-32(%ebp), %eax
+	addl	$3, %eax
+	movl	%eax, -56(%ebp)
 .L8:
-	movq	-72(%rbp), %rdx
-	leaq	-32(%rbp), %rax
-	subq	%rax, %rdx
-	movq	%rdx, %rax
-	leaq	-1(%rax), %rdx
-	leaq	-32(%rbp), %rax
-	movq	%rax, %rsi
-	movl	$1, %edi
-	movl	$0, %eax
+	movl	-56(%ebp), %edx
+	leal	-32(%ebp), %eax
+	subl	%eax, %edx
+	movl	%edx, %eax
+	subl	$1, %eax
+	subl	$4, %esp
+	pushl	%eax
+	leal	-32(%ebp), %eax
+	pushl	%eax
+	pushl	$1
 	call	write
-	movq	-8(%rbp), %rax
-	xorq	%fs:40, %rax
+	addl	$16, %esp
+	nop
+	movl	-12(%ebp), %eax
+	xorl	%gs:20, %eax
 	je	.L9
 	call	__stack_chk_fail
 .L9:
+	movl	-4(%ebp), %ebx
 	leave
-	.cfi_def_cfa 7, 8
+	.cfi_restore 5
+	.cfi_restore 3
+	.cfi_def_cfa 4, 4
 	ret
 	.cfi_endproc
 .LFE0:
@@ -128,56 +137,76 @@ writeint:
 readint:
 .LFB1:
 	.cfi_startproc
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	subq	$64, %rsp
-	movq	%fs:40, %rax
-	movq	%rax, -8(%rbp)
+	pushl	%ebp
+	.cfi_def_cfa_offset 8
+	.cfi_offset 5, -8
+	movl	%esp, %ebp
+	.cfi_def_cfa_register 5
+	subl	$72, %esp
+	movl	%gs:20, %eax
+	movl	%eax, -12(%ebp)
 	xorl	%eax, %eax
-	movl	$20, -44(%rbp)
-	movl	$0, -40(%rbp)
-	movl	-44(%rbp), %edx
-	leaq	-32(%rbp), %rax
-	movq	%rax, %rsi
-	movl	$0, %edi
-	movl	$0, %eax
+	movl	$20, -44(%ebp)
+	movl	$0, -40(%ebp)
+	subl	$4, %esp
+	pushl	-44(%ebp)
+	leal	-32(%ebp), %eax
+	pushl	%eax
+	pushl	$0
 	call	read
-	movl	%eax, -40(%rbp)
-	movl	$0, -56(%rbp)
-	movl	$1, -52(%rbp)
-	movl	-40(%rbp), %eax
-	movl	%eax, -48(%rbp)
-	jmp	.L11
-.L12:
-	movl	-48(%rbp), %eax
-	cltq
-	movzbl	-32(%rbp,%rax), %eax
+	addl	$16, %esp
+	movl	%eax, -40(%ebp)
+	movl	$0, -60(%ebp)
+	movl	$1, -56(%ebp)
+	movzbl	-32(%ebp), %eax
+	movb	%al, -61(%ebp)
+	movl	$1, -48(%ebp)
+	cmpb	$45, -61(%ebp)
+	jne	.L11
+	movl	$0, -48(%ebp)
+.L11:
+	movl	-40(%ebp), %eax
+	subl	$2, %eax
+	movl	%eax, -52(%ebp)
+	jmp	.L12
+.L15:
+	leal	-32(%ebp), %edx
+	movl	-52(%ebp), %eax
+	addl	%edx, %eax
+	movzbl	(%eax), %eax
 	movsbl	%al, %eax
-	movl	%eax, -36(%rbp)
-	movl	-36(%rbp), %eax
-	imull	-52(%rbp), %eax
-	addl	%eax, -56(%rbp)
-	subl	$1, -48(%rbp)
-	movl	-52(%rbp), %edx
+	subl	$48, %eax
+	movl	%eax, -36(%ebp)
+	movl	-36(%ebp), %eax
+	imull	-56(%ebp), %eax
+	addl	%eax, -60(%ebp)
+	cmpl	$0, -48(%ebp)
+	jne	.L13
+	cmpl	$1, -52(%ebp)
+	jne	.L13
+	negl	-60(%ebp)
+	jmp	.L14
+.L13:
+	subl	$1, -52(%ebp)
+	movl	-56(%ebp), %edx
 	movl	%edx, %eax
 	sall	$2, %eax
 	addl	%edx, %eax
 	addl	%eax, %eax
-	movl	%eax, -52(%rbp)
-.L11:
-	cmpl	$0, -48(%rbp)
-	jns	.L12
-	movl	-56(%rbp), %eax
-	movq	-8(%rbp), %rcx
-	xorq	%fs:40, %rcx
-	je	.L14
-	call	__stack_chk_fail
+	movl	%eax, -56(%ebp)
+.L12:
+	cmpl	$0, -52(%ebp)
+	jns	.L15
 .L14:
+	movl	-60(%ebp), %eax
+	movl	-12(%ebp), %ecx
+	xorl	%gs:20, %ecx
+	je	.L17
+	call	__stack_chk_fail
+.L17:
 	leave
-	.cfi_def_cfa 7, 8
+	.cfi_restore 5
+	.cfi_def_cfa 4, 4
 	ret
 	.cfi_endproc
 .LFE1:
@@ -187,19 +216,21 @@ readint:
 multiply:
 .LFB2:
 	.cfi_startproc
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	movl	%edi, -20(%rbp)
-	movl	%esi, -24(%rbp)
-	movl	-20(%rbp), %eax
-	imull	-24(%rbp), %eax
-	movl	%eax, -4(%rbp)
-	movl	-4(%rbp), %eax
-	popq	%rbp
-	.cfi_def_cfa 7, 8
+	pushl	%ebp
+	.cfi_def_cfa_offset 8
+	.cfi_offset 5, -8
+	movl	%esp, %ebp
+	.cfi_def_cfa_register 5
+	subl	$24, %esp
+	movl	8(%ebp), %eax
+	imull	12(%ebp), %eax
+	movl	%eax, -20(%ebp)
+	fildl	-20(%ebp)
+	fstpl	-8(%ebp)
+	fldl	-8(%ebp)
+	leave
+	.cfi_restore 5
+	.cfi_def_cfa 4, 4
 	ret
 	.cfi_endproc
 .LFE2:
@@ -209,23 +240,25 @@ multiply:
 divide:
 .LFB3:
 	.cfi_startproc
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	movl	%edi, -20(%rbp)
-	movl	%esi, -24(%rbp)
-	movl	-20(%rbp), %eax
+	pushl	%ebp
+	.cfi_def_cfa_offset 8
+	.cfi_offset 5, -8
+	movl	%esp, %ebp
+	.cfi_def_cfa_register 5
+	subl	$24, %esp
+	movl	8(%ebp), %eax
 	cltd
-	idivl	-24(%rbp)
-	movl	%eax, -4(%rbp)
-	movl	-4(%rbp), %eax
-	popq	%rbp
-	.cfi_def_cfa 7, 8
+	idivl	12(%ebp)
+	movl	%eax, -20(%ebp)
+	fildl	-20(%ebp)
+	fstpl	-8(%ebp)
+	fldl	-8(%ebp)
+	leave
+	.cfi_restore 5
+	.cfi_def_cfa 4, 4
 	ret
 	.cfi_endproc
 .LFE3:
 	.size	divide, .-divide
-	.ident	"GCC: (Ubuntu 4.9.2-10ubuntu13) 4.9.2"
+	.ident	"GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.9) 5.4.0 20160609"
 	.section	.note.GNU-stack,"",@progbits

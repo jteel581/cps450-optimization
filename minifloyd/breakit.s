@@ -31,7 +31,7 @@ movl %eax, _mov
 ############################
 pushl _mov
 call writeint
-popl %ecx
+addl $4, %esp
 ############################
 # Line 12: mov:=mov/-1
 ############################
@@ -48,7 +48,7 @@ movl %eax, _mov
 ############################
 pushl _mov
 call writeint
-popl %ecx
+addl $4, %esp
 ############################
 # Line 15: mov:=mov*-1
 ############################
@@ -65,7 +65,7 @@ movl %eax, _mov
 ############################
 pushl _mov
 call writeint
-popl %ecx
+addl $4, %esp
 ############################
 # Line 18: if(true)then
 # x:=1
@@ -218,7 +218,7 @@ _doifLine24:
 ############################
 pushl _y
 call writeint
-popl %ecx
+addl $4, %esp
 jmp _endIfLine24
 _elseLine24:
 _endIfLine24:
@@ -229,7 +229,7 @@ _endwhile22:
 ############################
 pushl _x
 call writeint
-popl %ecx
+addl $4, %esp
 ############################
 # Line 29: x:=x+1
 ############################
