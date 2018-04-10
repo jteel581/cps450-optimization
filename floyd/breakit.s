@@ -2,6 +2,7 @@
 .comm _mov, 4, 4
 .comm _x, 4, 4
 .comm _y, 4, 4
+.comm _j, 4, 4
 ############################
 # Line 2: mov:int
 ############################
@@ -12,11 +13,55 @@
 # Line 4: y:int
 ############################
 ############################
-# Line 9: mov:=12*in.readint()
+# Line 6: start()is
+# j:int
+# begin
+# j:=1
+# mov:=12*in.readint()
+# out.writeint(mov)
+# 
+# mov:=mov/-1
+# out.writeint(mov)
+# 
+# mov:=mov*-1
+# out.writeint(mov)
+# 
+# if(true)then
+# x:=1
+# loopwhilenot(x>3)
+# y:=2
+# loopwhiley>-2
+# y:=y-1
+# ifnot(y>=0)then
+# out.writeint(y)
+# endif
+# endloop
+# out.writeint(x)
+# x:=x+1
+# endloop
+# endif
+# endstart
 ############################
 .text
 .global main
 main:
+.global start
+.type start, @function
+start:
+pushl %ebp
+movl %esp, %ebp
+############################
+# Line 7: j:int
+############################
+############################
+# Line 9: j:=1
+############################
+pushl $1
+popl %eax
+movl %eax, -8(%ebp)
+############################
+# Line 10: mov:=12*in.readint()
+############################
 call readint
 pushl %eax
 pushl $12
@@ -27,13 +72,13 @@ pushl %eax
 popl %eax
 movl %eax, _mov
 ############################
-# Line 10: out.writeint(mov)
+# Line 11: out.writeint(mov)
 ############################
 pushl _mov
 call writeint
 addl $4, %esp
 ############################
-# Line 12: mov:=mov/-1
+# Line 13: mov:=mov/-1
 ############################
 pushl $-1
 pushl _mov
@@ -44,13 +89,13 @@ pushl %eax
 popl %eax
 movl %eax, _mov
 ############################
-# Line 13: out.writeint(mov)
+# Line 14: out.writeint(mov)
 ############################
 pushl _mov
 call writeint
 addl $4, %esp
 ############################
-# Line 15: mov:=mov*-1
+# Line 16: mov:=mov*-1
 ############################
 pushl $-1
 pushl _mov
@@ -61,13 +106,13 @@ pushl %eax
 popl %eax
 movl %eax, _mov
 ############################
-# Line 16: out.writeint(mov)
+# Line 17: out.writeint(mov)
 ############################
 pushl _mov
 call writeint
 addl $4, %esp
 ############################
-# Line 18: if(true)then
+# Line 19: if(true)then
 # x:=1
 # loopwhilenot(x>3)
 # y:=2
@@ -85,17 +130,17 @@ addl $4, %esp
 pushl $1
 popl %eax
 cmpl $0, %eax
-jne _doifLine18
-jmp _elseLine18
-_doifLine18:
+jne _doifLine19
+jmp _elseLine19
+_doifLine19:
 ############################
-# Line 19: x:=1
+# Line 20: x:=1
 ############################
 pushl $1
 popl %eax
 movl %eax, _x
 ############################
-# Line 20: loopwhilenot(x>3)
+# Line 21: loopwhilenot(x>3)
 # y:=2
 # loopwhiley>-2
 # y:=y-1
@@ -107,70 +152,70 @@ movl %eax, _x
 # x:=x+1
 # endloop
 ############################
-_while20:
+_while21:
 pushl _x
 pushl $3
 popl %ebx
 popl %eax
 cmpl %ebx, %eax
-jg _greaterLine20
-jmp _notGreaterLine20
-_greaterLine20:
+jg _greaterLine21
+jmp _notGreaterLine21
+_greaterLine21:
 pushl $1
-jmp _endGreaterLine20
-_notGreaterLine20:
+jmp _endGreaterLine21
+_notGreaterLine21:
 pushl $0
-_endGreaterLine20:
+_endGreaterLine21:
 popl %eax
 cmpl $0, %eax
-je _eqLine20.0
-jmp _notEqLine20.0
-_eqLine20.0:
+je _eqLine21.0
+jmp _notEqLine21.0
+_eqLine21.0:
 pushl $1
-jmp _endEqLine20.0
-_notEqLine20.0:
+jmp _endEqLine21.0
+_notEqLine21.0:
 pushl $0
-_endEqLine20.0:
+_endEqLine21.0:
 popl %eax
 cmpl $0, %eax
-jne _startwhilebody20
-jmp _endwhile20
-_startwhilebody20:
+jne _startwhilebody21
+jmp _endwhile21
+_startwhilebody21:
 ############################
-# Line 21: y:=2
+# Line 22: y:=2
 ############################
 pushl $2
 popl %eax
 movl %eax, _y
 ############################
-# Line 22: loopwhiley>-2
+# Line 23: loopwhiley>-2
 # y:=y-1
 # ifnot(y>=0)then
 # out.writeint(y)
 # endif
 # endloop
 ############################
-_while22:
+_while23:
 pushl _y
 pushl $-2
 popl %ebx
 popl %eax
 cmpl %ebx, %eax
-jg _greaterLine22
-jmp _notGreaterLine22
-_greaterLine22:
+jg _greaterLine23
+jmp _notGreaterLine23
+_greaterLine23:
 pushl $1
-jmp _endGreaterLine22
-_notGreaterLine22:
+jmp _endGreaterLine23
+_notGreaterLine23:
 pushl $0
-_endGreaterLine22:
+_endGreaterLine23:
 popl %eax
 cmpl $0, %eax
-jne _startwhilebody22
-jmp _endwhile22
-_startwhilebody22:
+jne _startwhilebody23
+jmp _endwhile23
+_startwhilebody23:
 ############################
-# Line 23: y:=y-1
+# Line 24: y:=y-1
 ############################
 pushl _y
 pushl $1
@@ -181,7 +226,7 @@ pushl %eax
 popl %eax
 movl %eax, _y
 ############################
-# Line 24: ifnot(y>=0)then
+# Line 25: ifnot(y>=0)then
 # out.writeint(y)
 # endif
 ############################
@@ -190,48 +235,48 @@ pushl $0
 popl %ebx
 popl %eax
 cmpl %ebx, %eax
-jge _greaterOrEqLine24
-jmp _notGreaterOrEqLine24
-_greaterOrEqLine24:
+jge _greaterOrEqLine25
+jmp _notGreaterOrEqLine25
+_greaterOrEqLine25:
 pushl $1
-jmp _endGreaterOrEqLine24
-_notGreaterOrEqLine24:
+jmp _endGreaterOrEqLine25
+_notGreaterOrEqLine25:
 pushl $0
-_endGreaterOrEqLine24:
+_endGreaterOrEqLine25:
 popl %eax
 cmpl $0, %eax
-je _eqLine24.1
-jmp _notEqLine24.1
-_eqLine24.1:
+je _eqLine25.1
+jmp _notEqLine25.1
+_eqLine25.1:
 pushl $1
-jmp _endEqLine24.1
-_notEqLine24.1:
+jmp _endEqLine25.1
+_notEqLine25.1:
 pushl $0
-_endEqLine24.1:
+_endEqLine25.1:
 popl %eax
 cmpl $0, %eax
-jne _doifLine24
-jmp _elseLine24
-_doifLine24:
+jne _doifLine25
+jmp _elseLine25
+_doifLine25:
 ############################
-# Line 25: out.writeint(y)
+# Line 26: out.writeint(y)
 ############################
 pushl _y
 call writeint
 addl $4, %esp
-jmp _endIfLine24
-_elseLine24:
-_endIfLine24:
-jmp _while22
-_endwhile22:
+jmp _endIfLine25
+_elseLine25:
+_endIfLine25:
+jmp _while23
+_endwhile23:
 ############################
-# Line 28: out.writeint(x)
+# Line 29: out.writeint(x)
 ############################
 pushl _x
 call writeint
 addl $4, %esp
 ############################
-# Line 29: x:=x+1
+# Line 30: x:=x+1
 ############################
 pushl _x
 pushl $1
@@ -241,9 +286,11 @@ addl %ebx, %eax
 pushl %eax
 popl %eax
 movl %eax, _x
-jmp _while20
-_endwhile20:
-jmp _endIfLine18
-_elseLine18:
-_endIfLine18:
+jmp _while21
+_endwhile21:
+jmp _endIfLine19
+_elseLine19:
+_endIfLine19:
+popl %ebp
+ret 
 ret

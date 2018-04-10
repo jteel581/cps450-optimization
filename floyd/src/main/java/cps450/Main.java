@@ -2,7 +2,12 @@
 // This is file that holds the 'Main' class and method.
 
 package cps450;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import org.antlr.v4.gui.Trees;
 import org.antlr.v4.runtime.CharStream;
@@ -21,7 +26,7 @@ public class Main
 
         System.out.println();
         // new phase 5 way 
-        
+        /*
         for (String file: ops.getFileNames())
         {
     		boolean lastFile = false;
@@ -110,10 +115,10 @@ public class Main
             
         }
         
-        
+        */
         
         // old way
-        /*
+        
         for (String file: ops.getFileNames())
         {
             CharStream input = CharStreams.fromFileName(file);
@@ -190,7 +195,7 @@ public class Main
             	System.out.println(totalErrors + " errors found");
             }
         
-        }*/
+        }
     }
     
     

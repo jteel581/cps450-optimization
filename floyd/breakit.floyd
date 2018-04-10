@@ -4,8 +4,9 @@ class breakit is
   y: int
   
   start() is
+  j: int
   begin
-
+	j := 1
     mov := 12 * in.readint()   ~ Enter 10
     out.writeint(mov)           ~ 120
     

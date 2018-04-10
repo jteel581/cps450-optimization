@@ -14,7 +14,7 @@ class_decl returns [Type classType, ArrayList<VarDecl> varList, ArrayList<Method
    END id3=IDENTIFIER
    ;
 
-method_decl returns [Type methodType]
+method_decl returns [Type methodType, Symbol sym]
    : id1=IDENTIFIER OPENPAREN (argument_decl_list)? CLOSEPAREN (COLON type)? IS (NEWLINE+)
    (vars+=var_decl)*
    BEGIN (NEWLINE+)
@@ -22,11 +22,11 @@ method_decl returns [Type methodType]
    END id2=IDENTIFIER (NEWLINE+)
    ;
 
-var_decl returns [Type varDeclType]
+var_decl returns [Type varDeclType, Symbol sym]
    : IDENTIFIER (COLON type)? (ASSIGNMENT expression)? (NEWLINE+)
    ;
 
-type returns [Type ttype]
+type returns [Type ttype, Symbol sym]
    : (INT | STRING | BOOLEAN)					# RegType
    | IDENTIFIER									# IdType
    | type OPENBRACKET expression? CLOSEBRACKET	# ExprType
@@ -36,11 +36,11 @@ argument_decl_list
    : (args+=argument_decl SEMICOLON)* args+=argument_decl
    ;
 
-argument_decl 
+argument_decl returns [Symbol sym]
    : IDENTIFIER COLON type
    ;
 
-statement_list
+statement_list 
    : ( stmts+=statement (NEWLINE+))*
    ;
 
@@ -51,7 +51,7 @@ statement
    | call_stmt			# CallStatement
    ;
 
-assignment_stmt 
+assignment_stmt returns [Symbol sym]
    : IDENTIFIER (OPENBRACKET e1=expression CLOSEBRACKET)* ASSIGNMENT e2=expression
    ;
 
@@ -75,49 +75,49 @@ expression_list
    ;
    
    
-factor returns [Type factorType]
+factor returns [Type factorType, Symbol sym]
    : factor AND factoid		# AndFactoidFactor
    | factor AND expression	# AndExpressionFactor
    | factoid				# FactoidFactor
    ;
 
-factoid returns [Type factoidType]
+factoid returns [Type factoidType, Symbol sym]
    : n1=nanoterm relational_op n2=nanoterm 	# NanotermFactoid
    | nanoterm relational_op expression		# ExpressionFactoid
    | bbyte									# BbyteFactoid
    ;
 
-bbyte returns [Type bbyteType]
+bbyte returns [Type bbyteType, Symbol sym]
    : bbyte CONCAT nybble		# ConcatNybbleBbyte
    | bbyte CONCAT expression	# ConcatExpressionBbyte
    | nybble						# NybbleBbyte
    ;
 
-nybble returns [Type nybbleType]
+nybble returns [Type nybbleType, Symbol sym]
    : nybble add_op term			# AdOpTermNybble
    | nybble add_op expression	# AdopExpressionNybble
    | term						# TermNybble
    ;
 
-term returns [Type termType]
+term returns [Type termType, Symbol sym]
    : term mul_op microterm		# MulOpMicrotermTerm
    | term mul_op expression		# MulOPExpressionTerm
    | microterm					# MicrotermTerm
    ;
 
-microterm returns [Type exprType]
+microterm returns [Type exprType, Symbol sym]
    : unary_op (IDENTIFIER | STRINGLITERAL | INTEGERLITERAL | TRUE | FALSE | NULL | ME) (PERIOD)? exprtail	# UnaryOpRegularMicroterm
    | unary_op expression																					# UnaryOpExpressionMicroterm
    | (IDENTIFIER | STRINGLITERAL | INTEGERLITERAL | TRUE | FALSE | NULL | ME) (PERIOD)? exprtail			# RegularMicroterm
    | nanoterm																								# NanotermMicroterm
    ;
 
-nanoterm returns [Type nanoTermType]
+nanoterm returns [Type nanoTermType, Symbol sym]
    : (IDENTIFIER | STRINGLITERAL | INTEGERLITERAL | TRUE | FALSE | NULL | ME) (PERIOD)? exprtail	# RegularNanoterm	
    | OPENPAREN expression CLOSEPAREN																# ParanNanoterm
    ;   
 
-expression returns [Type exprType]
+expression returns [Type exprType, Symbol sym]
    : (IDENTIFIER | STRINGLITERAL | INTEGERLITERAL | TRUE | FALSE | NULL | ME) (PERIOD)? exprtail				# NormalExpression
    | NEW type (PERIOD)? exprtail																				# NewTypeExpression
    | expression OR factor (PERIOD)? exprtail																	# OrExpression
@@ -127,7 +127,7 @@ expression returns [Type exprType]
    | exprtail 																									# ExprTailExpression
    ;
 
-exprtail returns [Type exprTailType]
+exprtail returns [Type exprTailType, Symbol sym]
    : IDENTIFIER OPENPAREN (expression_list)? CLOSEPAREN exprtail	# RegularExprTail
    |																# EmptyExprTail
    ;

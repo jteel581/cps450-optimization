@@ -9,6 +9,7 @@ import cps450.FloydParser.AdopExpressionNybbleContext;
 import cps450.FloydParser.AndExpressionFactorContext;
 import cps450.FloydParser.AndFactoidFactorContext;
 import cps450.FloydParser.Argument_declContext;
+import cps450.FloydParser.Argument_decl_listContext;
 import cps450.FloydParser.Assignment_stmtContext;
 import cps450.FloydParser.BbyteFactoidContext;
 import cps450.FloydParser.BracketExpressionContext;
@@ -60,6 +61,7 @@ public class SemanticChecker extends FloydBaseListener {
 	SemanticErrorHandler handyMan;
 	Integer numErrors = 0;
 	String fileName;
+	Integer localOffset = -8;
 	
 	public SemanticChecker(Options ops) {
 		super();
@@ -148,7 +150,15 @@ public class SemanticChecker extends FloydBaseListener {
 			//System.out.println("type is " + typeStr);
 			//Type t = new Type(typeStr);
 			VarDecl decl = new VarDecl(t, name);
+			if (st.getScope() == 2)
+			{
+				decl.setOffSet(localOffset);
+				localOffset -= 4;
+			}
+			
 			Symbol s = st.lookup(name);
+			ctx.sym = s;
+
 			if (s == null)
 			{
 				st.push(name, decl);
@@ -194,6 +204,8 @@ public class SemanticChecker extends FloydBaseListener {
 		String name = ctx.IDENTIFIER().getText();
 		//System.out.println("parent of assignment " + name + " is " + ctx.getParent().getText());
 		Symbol s = st.lookup(name);
+		ctx.sym = s;
+
 		if (s == null)
 		{
 			handyMan.reportError(fileName, ctx, SemanticError.UNDECLAREDVAR);
@@ -352,6 +364,8 @@ public class SemanticChecker extends FloydBaseListener {
 
 					}
 					ctx.exprType = symbolType;
+					ctx.sym = s;
+
 				}
 				return;
 			}
@@ -427,6 +441,8 @@ public class SemanticChecker extends FloydBaseListener {
 			}
 			else
 			{
+				ctx.sym = s;
+
 				Type symbolType;
 				if (s.varDecl != null)
 				{
@@ -800,6 +816,8 @@ public class SemanticChecker extends FloydBaseListener {
 			}
 			else
 			{
+				ctx.sym = s;
+
 				Type symbolType;
 				if (s.varDecl != null)
 				{
@@ -948,6 +966,7 @@ public class SemanticChecker extends FloydBaseListener {
 		}
 		else
 		{
+			
 			ctx.ttype = s.decl.type;
 		}
 	}
@@ -1077,6 +1096,8 @@ public class SemanticChecker extends FloydBaseListener {
 			Symbol s = st.lookup(identifier);
 			if ( s != null)
 			{
+				ctx.sym = s;
+
 				Type t;
 				if (s.varDecl != null)
 				{
@@ -1296,6 +1317,8 @@ public class SemanticChecker extends FloydBaseListener {
 			}
 			else
 			{
+				ctx.sym = s;
+
 				Type symbolType;
 				if (s.varDecl != null)
 				{
@@ -1426,6 +1449,7 @@ public class SemanticChecker extends FloydBaseListener {
 		//System.out.println("Stack before method exit: \n" + st.toString());
 		
 		st.endScope();
+		localOffset = -8;
 		//System.out.println("Stack after exit: \n" + st.toString());
 		//MethodDecl md = new MethodDecl()
 		
@@ -1580,6 +1604,23 @@ public class SemanticChecker extends FloydBaseListener {
 	}
 
 
+	
+	
+
+	@Override
+	public void exitArgument_decl_list(Argument_decl_listContext ctx) {
+		Integer offSet = 8;
+		for (Argument_declContext adc : ctx.args)
+		{
+			Symbol s = st.lookup(adc.IDENTIFIER().getText());	
+			VarDecl vd = s.varDecl;
+			vd.setOffSet(offSet);
+			offSet += 4;
+			
+		}
+	}
+
+
 
 	@Override
 	public void exitClass_decl(Class_declContext ctx) {
@@ -1644,6 +1685,7 @@ public class SemanticChecker extends FloydBaseListener {
 		//System.out.println("Stack before class exit: \n" + st.toString());
 		
 		st.endScope();
+		localOffset = -8;
 		st.push(className, s.classDecl);
 		//System.out.println("Stack after exit: \n" + st.toString());
 	}

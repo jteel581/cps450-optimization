@@ -1,6 +1,8 @@
 package cps450;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MethodDecl extends Declaration {
 
@@ -8,6 +10,7 @@ public class MethodDecl extends Declaration {
 	Type returnType;
 	ArrayList<String> parameters;
 	ArrayList<Type> parameterTypes;
+	Map<String, Integer> offsets;
 	public MethodDecl(Type returnType, ArrayList<String> parameters, ArrayList<Type> parameterTypes) {
 		super(returnType);
 		this.returnType = returnType;
@@ -15,8 +18,32 @@ public class MethodDecl extends Declaration {
 		this.parameterTypes = parameterTypes;
 		this.methodName = "";
 		this.methodDecl = true;
+		this.offsets = new HashMap<>();
+		this.setUpOffsets();
 		
 	}
+	private void setUpOffsets()
+	{
+		Integer offSet = 8;
+		for (String param : this.parameters)
+		{
+			this.offsets.put(param, offSet);
+			offSet += 4;
+		}
+	}
+	
+	
+	public Map<String, Integer> getOffsets() {
+		return offsets;
+	}
+	
+	public Integer getOffSet(String key)
+	{
+		Integer offSet = 0;
+		offSet = this.offsets.get(key);
+		return offSet;
+	}
+	
 	@Override
 	public String toString() {
 		String methodDeclString = "";
