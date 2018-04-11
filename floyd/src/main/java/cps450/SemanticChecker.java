@@ -108,6 +108,7 @@ public class SemanticChecker extends FloydBaseListener {
 		//Type t = new Type(typeStr);
 		VarDecl decl = new VarDecl(t, name);
 		st.push(name, decl);
+		ctx.sym = st.lookup(name);
 		
 	}
 
@@ -157,7 +158,6 @@ public class SemanticChecker extends FloydBaseListener {
 			}
 			
 			Symbol s = st.lookup(name);
-			ctx.sym = s;
 
 			if (s == null)
 			{
@@ -172,6 +172,8 @@ public class SemanticChecker extends FloydBaseListener {
 				handyMan.reportError(fileName, ctx, SemanticError.REDECLAREDVAR);
 				//System.out.println("89");
 			}
+			s = st.lookup(name);
+			ctx.sym = s;
 		}
 		else if (ctx.ASSIGNMENT() != null)
 		{
@@ -1082,6 +1084,7 @@ public class SemanticChecker extends FloydBaseListener {
 	public void exitExprTailExpression(ExprTailExpressionContext ctx) {
 		//System.out.println("in expression tail expression: " + ctx.getText());
 		ctx.exprType = ctx.exprtail().exprTailType;
+		ctx.sym = ctx.exprtail().sym;
 	}
 
 	
@@ -1140,6 +1143,7 @@ public class SemanticChecker extends FloydBaseListener {
 					{
 						checkPassedParams(ctx, paramTypes);
 					}
+					ctx.sym = s;
 					//String methodName = s.methodDecl.methodName;
 					//System.out.println("METHOD IS::::::::::" + methodName);
 					ctx.exprTailType = md.returnType;			
@@ -1556,11 +1560,7 @@ public class SemanticChecker extends FloydBaseListener {
 		//ArrayList<VarDecl> vars = new ArrayList<>();
 		//System.out.println("method type is " + type.toString());
 		String name = ctx.id1.getText();
-		if (!name.equals("start"))
-		{
-			handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
-
-		}
+		
 		Symbol lookedUpSymbol = st.lookup(name);
 		if (lookedUpSymbol != null && (lookedUpSymbol.scopeNum == st.getScope()))
 		{

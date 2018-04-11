@@ -3,8 +3,7 @@ class breakit is
   x: int
   y: int
   
-  start() is
-  j: int
+  start(j: int) is
   begin
 	j := 1
     mov := 12 * in.readint()   ~ Enter 10

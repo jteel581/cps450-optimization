@@ -11,6 +11,8 @@ import cps450.FloydParser.AdOpTermNybbleContext;
 import cps450.FloydParser.AdopExpressionNybbleContext;
 import cps450.FloydParser.AndExpressionFactorContext;
 import cps450.FloydParser.AndFactoidFactorContext;
+import cps450.FloydParser.Argument_declContext;
+import cps450.FloydParser.Argument_decl_listContext;
 import cps450.FloydParser.Assignment_stmtContext;
 import cps450.FloydParser.BbyteFactoidContext;
 import cps450.FloydParser.Call_stmtContext;
@@ -102,7 +104,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 					pw.println(".text");
 					
 					pw.println(".global main");
-					pw.println("main:");
 						
 					
 					
@@ -135,6 +136,8 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 
 			}
 		}
+		pw.println("main:");
+		pw.println("call start");
 		pw.println("ret");
 		pw.close();
 		//System.out.println("ret");
@@ -228,6 +231,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 	public void emitLabel(String label)
 	{
 		TargetInstruction targetInstruction = new TargetInstruction();
+		targetInstruction.directive = ".text";
 		targetInstruction.label = label;
 		instructions.add(targetInstruction);
 	}
@@ -235,6 +239,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 	public void emit(String instruction, String operand1, String operand2)
 	{
 		TargetInstruction targetInstruction = new TargetInstruction();
+		targetInstruction.directive = ".text";
 		targetInstruction.instruction = instruction;
 		targetInstruction.operand1 = operand1;
 		targetInstruction.operand2 = operand2;
@@ -309,20 +314,39 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		emitLabel(label + ":");
 		emit("pushl", "%ebp");
 		emit("movl", "%esp", "%ebp");
+		Integer numLocals = 0;
+		//visit(ctx.argument_decl_list());
 		// probably visit(arg_decl_list)
-		
+		for (Var_declContext vdc : ctx.vars)
+		{
+			numLocals += 1;
+		}
+		Integer reserveSize = 4;
+		reserveSize += 4 * numLocals;
+		emit("subl", "$" + reserveSize, "%esp");
 		for (Var_declContext vdc : ctx.vars)
 		{
 			visit(vdc);
 		}
 		for (StatementContext stmtc : ctx.statement_list().stmts)
 		{
+			
 			visit(stmtc);
 		}
+		emit("movl", "%ebp", "%esp");
+
 		emit("popl", "%ebp");
 		emit("ret", "");
 		return null;
 	}
+	
+	
+
+
+	
+
+
+	
 
 
 	@Override
@@ -330,20 +354,41 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		String fullComment = generateComment(ctx);
 		emitComment(fullComment);
 		visit(ctx.e2);
-		Symbol s = ctx.sym;
-		if (s != null && s.scopeNum == LOCAL)
+		// check if right side is a method call
+		Symbol sym = ctx.e2.sym;
+		if (sym != null && sym.methodDecl != null && sym.methodDecl.methodDecl)
 		{
+			Symbol s = ctx.sym;
 			Integer offset = s.varDecl.offSet;
+			emit("movl", "%eax",  offset + "(%ebp)" );
 
-			emit("popl", "%eax");
-			emit("movl", "%eax", offset + "(%ebp)" );
 		}
-		else
+		else 
 		{
-			String label = "_" + ctx.IDENTIFIER().getText();
-			emit("popl", "%eax");
-			emit("movl", "%eax, " + label);
+			Symbol s = ctx.sym;
+			if (s != null && s.scopeNum == LOCAL)
+			{
+				Integer offset = s.varDecl.offSet;
+
+				emit("popl", "%eax");
+				emit("movl", "%eax", offset + "(%ebp)" );
+			}
+			else if (s.methodDecl != null)
+			{
+				Integer offset = -4;
+				emit("popl", "%eax");
+				emit("movl", "%eax", offset + "(%ebp)");
+				
+			}
+			else
+			{
+				String label = "_" + ctx.IDENTIFIER().getText();
+				emit("popl", "%eax");
+				emit("movl", "%eax, " + label);
+			}
 		}
+		
+		
 		
 		return null;
 	}
@@ -521,6 +566,32 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			Integer numParams = ctx.expression_list().exprs.size();
 			Integer paramsSize = numParams * 4;
 			// call that looks like boo()
+			// if there are params
+			if (!ctx.expression_list().getText().equals(""))
+			{
+				for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
+				{
+					visit(ctx.expression_list().expression(i));
+				}
+				// ask schaub if this is correct
+				// code to push me goes here
+				emit("call", methodName);
+				
+				emit("addl","$" + paramsSize, "%esp" );
+			}
+			// if there are not params
+			else 
+			{
+				emit("call", methodName);
+			}
+			// call that looks like foo.boo
+			
+			
+			
+			
+			
+			
+			/*
 			NormalExpressionContext ec = (NormalExpressionContext) ctx.getParent();
 			String classReferenced = "";
 			if (ec.IDENTIFIER() != null)
@@ -570,7 +641,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 				{
 					emit("call", methodName);
 				}
-			}
+			}*/
 			break;
 		}
 		return null;
