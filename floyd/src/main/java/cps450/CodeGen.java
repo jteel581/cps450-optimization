@@ -334,7 +334,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			visit(stmtc);
 		}
 		emit("movl", "%ebp", "%esp");
-
+		emit("movl", "-4(%ebp)", "%eax");
 		emit("popl", "%ebp");
 		emit("ret", "");
 		return null;
@@ -355,37 +355,59 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		emitComment(fullComment);
 		visit(ctx.e2);
 		// check if right side is a method call
+		boolean rightSideIsMethod = false;
+		Symbol s = ctx.sym;
+
 		Symbol sym = ctx.e2.sym;
 		if (sym != null && sym.methodDecl != null && sym.methodDecl.methodDecl)
 		{
-			Symbol s = ctx.sym;
-			Integer offset = s.varDecl.offSet;
-			emit("movl", "%eax",  offset + "(%ebp)" );
-
-		}
-		else 
-		{
-			Symbol s = ctx.sym;
-			if (s != null && s.scopeNum == LOCAL)
+			//s = ctx.sym;
+			
+			rightSideIsMethod = true;
+			/*
+			Integer offset;
+			if (s.varDecl != null )
 			{
-				Integer offset = s.varDecl.offSet;
+				offset = s.varDecl.offSet;
 
-				emit("popl", "%eax");
-				emit("movl", "%eax", offset + "(%ebp)" );
-			}
-			else if (s.methodDecl != null)
-			{
-				Integer offset = -4;
-				emit("popl", "%eax");
-				emit("movl", "%eax", offset + "(%ebp)");
-				
 			}
 			else
+				
 			{
-				String label = "_" + ctx.IDENTIFIER().getText();
-				emit("popl", "%eax");
-				emit("movl", "%eax, " + label);
+				offset = -4;
 			}
+			emit("movl", "%eax",  offset + "(%ebp)" );
+			*/
+		}
+		if (s != null && s.scopeNum == LOCAL)
+		{
+			Integer offset = s.varDecl.offSet;
+			if (!rightSideIsMethod)
+			{
+				emit("popl", "%eax");
+
+			}
+			emit("movl", "%eax", offset + "(%ebp)" );
+		}
+		else if (s.methodDecl != null)
+		{
+			Integer offset = -4;
+			if (!rightSideIsMethod)
+			{
+				emit("popl", "%eax");
+
+			}			
+			emit("movl", "%eax", offset + "(%ebp)");
+			
+		}
+		else
+		{
+			String label = "_" + ctx.IDENTIFIER().getText();
+			if (!rightSideIsMethod)
+			{
+				emit("popl", "%eax");
+
+			}			emit("movl", "%eax, " + label);
 		}
 		
 		
@@ -490,7 +512,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		default:
 			
 			// call that looks like boo()
-			if (ctx.expression().getText().equals(""))
+			if (ctx.expression() != null && ctx.expression().getText().equals(""))
 			{
 				// if there are params
 				if (!ctx.expression_list().getText().equals(""))
@@ -578,6 +600,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 				emit("call", methodName);
 				
 				emit("addl","$" + paramsSize, "%esp" );
+				
 			}
 			// if there are not params
 			else 
@@ -642,6 +665,11 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 					emit("call", methodName);
 				}
 			}*/
+			if (ctx.sym.methodDecl.returnType != Type.VOID)
+			{
+				emit("pushl", "%eax");
+
+			}
 			break;
 		}
 		return null;
@@ -661,7 +689,17 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 				Symbol sym = ctx.sym;
 				if (sym.scopeNum == LOCAL)
 				{
-					Integer offset = sym.varDecl.offSet;
+					Integer offset;
+					if (sym.varDecl != null )
+					{
+						offset = sym.varDecl.offSet;
+
+					}
+					else
+						
+					{
+						offset = -4;
+					}
 					emit("pushl", offset + "(%ebp)");
 				}
 				else
@@ -1022,8 +1060,17 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 				Symbol sym = ctx.sym;
 				if (sym.scopeNum == LOCAL)
 				{
-					Integer offset = sym.varDecl.offSet;
-					emit("pushl", offset + "(%ebp)");
+					Integer offset;
+					if (sym.varDecl != null )
+					{
+						offset = sym.varDecl.offSet;
+
+					}
+					else
+						
+					{
+						offset = -4;
+					}					emit("pushl", offset + "(%ebp)");
 				}
 				else
 				{
@@ -1150,7 +1197,17 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 				Symbol sym = ctx.sym;
 				if (sym.scopeNum == LOCAL)
 				{
-					Integer offset = sym.varDecl.offSet;
+					Integer offset;
+					if (sym.varDecl != null )
+					{
+						offset = sym.varDecl.offSet;
+
+					}
+					else
+						
+					{
+						offset = -4;
+					}					
 					emit("pushl", offset + "(%ebp)");
 				}
 				else
@@ -1211,7 +1268,17 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 				Symbol sym = ctx.sym;
 				if (sym.scopeNum == LOCAL)
 				{
-					Integer offset = sym.varDecl.offSet;
+					Integer offset;
+					if (sym.varDecl != null )
+					{
+						offset = sym.varDecl.offSet;
+
+					}
+					else
+						
+					{
+						offset = -4;
+					}
 					emit("pushl", offset + "(%ebp)");
 				}
 				else

@@ -5,10 +5,18 @@ class math is
 		result := x + y
 		add := result
 	end add
+	oneThat(a: int) : int is
+	begin
+		if a = 1 then
+			oneThat := a
+		else
+			oneThat := oneThat(a - 1)
+		end if
+	end oneThat
 	start() is
 	result: int
 	begin
-		result := add(1, 2)
+		result := oneThat(10)
 		writeint(result)
 	end start
 end math

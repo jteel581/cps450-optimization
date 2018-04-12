@@ -11,6 +11,7 @@ public class MethodDecl extends Declaration {
 	ArrayList<String> parameters;
 	ArrayList<Type> parameterTypes;
 	Map<String, Integer> offsets;
+	Integer offSet;
 	public MethodDecl(Type returnType, ArrayList<String> parameters, ArrayList<Type> parameterTypes) {
 		super(returnType);
 		this.returnType = returnType;

@@ -1593,6 +1593,7 @@ public class SemanticChecker extends FloydBaseListener {
 		s.setName(name);
 		
 		s.methodDecl = md;
+		ctx.sym = s;
 		//System.out.println("METHODDECLARATION IS" + md.toString());
 
 		//System.out.println("Exiting methodDecl " + ctx.getText());
