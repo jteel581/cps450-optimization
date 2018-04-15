@@ -104,6 +104,7 @@ addl %ebx, %eax
 pushl %eax
 call meth2
 addl $8, %esp
+pushl %eax
 movl %eax, -4(%ebp)
 ############################
 # Line 24: out.writeint(a)
@@ -200,6 +201,7 @@ pushl -16(%ebp)
 pushl -12(%ebp)
 call meth1
 addl $8, %esp
+pushl %eax
 movl %eax, -8(%ebp)
 ############################
 # Line 40: out.writeint(d)

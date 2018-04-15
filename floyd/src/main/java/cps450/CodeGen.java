@@ -1,6 +1,9 @@
 package cps450;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -64,12 +67,14 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 	ArrayList<TargetInstruction> instructions = new ArrayList<>();
 	
 	
+	
+	
 	public void outputAssembly() throws IOException
 	{
 		boolean firstData = true;
 		boolean firstText = true;
 		//String fileName = ops.getFileNames().get(0);
-		String fileName = ops.getFileNames().get(0);
+		String fileName = ops.getFileNames().get(1);
 		fileName = fileName.replace(".floyd", ".s");
 		File assemblyFile = new File(fileName);
 		if(!assemblyFile.exists())

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 public class Options 
 {
     private ArrayList<String> filenames = new ArrayList<String>();
-
     // This is a getter method that gets the ArrayList filenames.
     public ArrayList<String> getFileNames()
     {
@@ -26,11 +25,12 @@ public class Options
         ds = false;
         dp = false;
         S = false;
+        filenames.add("stdlib.floyd");
         if (arguments.length < 1)
         {
             System.out.println("usage:");
-            System.out.println("  lexer <filename>");
-            System.out.println("  lexer -option(s) <filename>");
+            System.out.println("  floyd <filename>");
+            System.out.println("  floyd -option(s) <filename>");
             System.exit(1);
         }
         for(String arg: arguments)

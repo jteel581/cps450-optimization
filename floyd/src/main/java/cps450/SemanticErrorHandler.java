@@ -27,6 +27,7 @@ public class SemanticErrorHandler {
 	String notBooleanMessage = "Expressions in if and loop while tests must be boolean";
 	String typeNotSpecifiedMessage = "No type specified";
 	String noSuchMethodInClassMessage = "No such method for ";
+	String noStartMethodMessage = "The last class defined does not contain a start method.";
 
 	public SemanticErrorHandler() {
 		super();
@@ -149,6 +150,8 @@ public class SemanticErrorHandler {
 		case NOSUCHMETHODINCLASS:
 			fullMessage = messageHeader + noSuchMethodInClassMessage + ctx.getChild(0).getText();
 			break;
+		case NOSTARTMETHOD:
+			fullMessage = messageHeader + noStartMethodMessage;
 		default:
 			break;
 		}

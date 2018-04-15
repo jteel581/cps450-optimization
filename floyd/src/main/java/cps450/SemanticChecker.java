@@ -68,7 +68,7 @@ public class SemanticChecker extends FloydBaseListener {
 		this.ops = ops;
 		this.st = SymbolTable.getInstance();
 		this.handyMan = new SemanticErrorHandler();
-		this.fileName = ops.getFileNames().get(0);
+		this.fileName = ops.getFileNames().get(1);
 	}
 	
 	
@@ -1462,6 +1462,12 @@ public class SemanticChecker extends FloydBaseListener {
 
 	@Override
 	public void enterClass_decl(Class_declContext ctx) {
+		Symbol s = new Symbol();
+		s.setName(ctx.id1.getText());
+		ClassDecl cd = new ClassDecl(ctx.id1.getText(), null, null);
+		//s.classDecl = cd;
+		st.push(s.getName());
+		Type.createType(cd);
 		st.beginScope();
 	}
 	
@@ -1502,6 +1508,22 @@ public class SemanticChecker extends FloydBaseListener {
 	@Override
 	public void exitStart(StartContext ctx) {
 		Integer classNum = ctx.classes.size();
+		Class_declContext cd = ctx.classes.get(classNum - 1);
+		Boolean containsStart = false;
+		for (Method_declContext md : cd.methods)
+		{
+			if (md.id1.getText().equals("start"))
+			{
+				containsStart = true;
+				break;
+			}
+		}
+		if (!containsStart)
+		{
+			handyMan.reportError(fileName, ctx, SemanticError.NOSTARTMETHOD);
+		}
+		// old way, before allowing multiple classes
+		/*
 		if (classNum != 1)
 		{
 			if (classNum > 1)
@@ -1517,6 +1539,8 @@ public class SemanticChecker extends FloydBaseListener {
 			
 		}
 		numErrors = handyMan.numErrors;
+		*/
+		// end old way
 	}
 
 
@@ -1674,7 +1698,7 @@ public class SemanticChecker extends FloydBaseListener {
 		ctx.varList = variables;
 		ctx.methodList = methods;
 		ClassDecl cd = new ClassDecl(className, superClassName, variables, methods);
-		Symbol s = new Symbol();
+		Symbol s = st.lookup(className);
 		s.setName(className);
 		s.classDecl = cd;
 		

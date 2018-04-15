@@ -15,14 +15,21 @@ public class ClassDecl extends Declaration {
 		this.variables = variables;
 		this.methods = methods;
 		this.classDecl = true;
+		Type.createType(this);
+		this.type = Type.getTypeForName(className);
 	}
 	public ClassDecl(String className, ArrayList<VarDecl> variables, ArrayList<MethodDecl> methods) {
 		super(Type.VOID);
+
 		this.superClassName = null;
 		this.className = className;
 		this.variables = variables;
 		this.methods = methods;
 		this.classDecl = true;
+		Type.createType(this);
+		this.type = Type.getTypeForName(className);
+
+
 	}
 	@Override
 	public String toString() {
