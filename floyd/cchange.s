@@ -1,8 +1,3 @@
-.data
-.comm _Amt, 4, 4
-.comm _Quarters, 4, 4
-.comm _Dimes, 4, 4
-.comm _Nickels, 4, 4
 ############################
 # Line 6: Amt:int
 ############################
@@ -23,17 +18,17 @@
 ############################
 .text
 .global main
-.global ComputeChange
-.type ComputeChange, @function
-ComputeChange:
+.global _class_CChange_method_ComputeChange
+.type _class_CChange_method_ComputeChange, @function
+_class_CChange_method_ComputeChange:
 pushl %ebp
 movl %esp, %ebp
 subl $4, %esp
 ############################
 # Line 13: ComputeChange:=amt/denom
 ############################
+pushl 16(%ebp)
 pushl 12(%ebp)
-pushl 8(%ebp)
 call divide
 popl %ecx
 popl %ecx
@@ -50,18 +45,18 @@ ret
 # ComputeRemain:=amt-denom*qtydenom
 # endComputeRemain
 ############################
-.global ComputeRemain
-.type ComputeRemain, @function
-ComputeRemain:
+.global _class_CChange_method_ComputeRemain
+.type _class_CChange_method_ComputeRemain, @function
+_class_CChange_method_ComputeRemain:
 pushl %ebp
 movl %esp, %ebp
 subl $4, %esp
 ############################
 # Line 18: ComputeRemain:=amt-denom*qtydenom
 ############################
-pushl 8(%ebp)
-pushl 16(%ebp)
 pushl 12(%ebp)
+pushl 20(%ebp)
+pushl 16(%ebp)
 call multiply
 popl %ecx
 popl %ecx
@@ -114,9 +109,9 @@ ret
 # endif
 # endstart
 ############################
-.global start
-.type start, @function
-start:
+.global _class_CChange_method_start
+.type _class_CChange_method_start, @function
+_class_CChange_method_start:
 pushl %ebp
 movl %esp, %ebp
 subl $4, %esp
@@ -126,21 +121,29 @@ subl $4, %esp
 call readint
 pushl %eax
 popl %eax
-movl %eax, _Amt
+movl 8(%ebp), %ebx
+movl %eax, 8(%ebx)
 ############################
 # Line 24: out.writeint(Amt)
 ############################
-pushl _Amt
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
 call writeint
 addl $4, %esp
 ############################
 # Line 27: Quarters:=ComputeChange(Amt,25)
 ############################
 pushl $25
-pushl _Amt
-call ComputeChange
-addl $8, %esp
-movl %eax, _Quarters
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
+pushl 8(%ebp)
+call _class_CChange_method_ComputeChange
+addl $12, %esp
+pushl %eax
+movl 8(%ebp), %ebx
+movl %eax, 12(%ebx)
 ############################
 # Line 28: if(Quarters>0)then
 # out.writeint(Quarters)
@@ -148,7 +151,9 @@ movl %eax, _Quarters
 # out.writeint(0)
 # endif
 ############################
-pushl _Quarters
+movl 8(%ebp), %ebx
+movl 12(%ebx), %eax
+pushl %eax
 pushl $0
 popl %ebx
 popl %eax
@@ -169,7 +174,9 @@ _doifLine28:
 ############################
 # Line 29: out.writeint(Quarters)
 ############################
-pushl _Quarters
+movl 8(%ebp), %ebx
+movl 12(%ebx), %eax
+pushl %eax
 call writeint
 addl $4, %esp
 jmp _endIfLine28
@@ -184,20 +191,32 @@ _endIfLine28:
 ############################
 # Line 33: Amt:=ComputeRemain(Amt,25,Quarters)
 ############################
-pushl _Quarters
+movl 8(%ebp), %ebx
+movl 12(%ebx), %eax
+pushl %eax
 pushl $25
-pushl _Amt
-call ComputeRemain
-addl $12, %esp
-movl %eax, _Amt
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
+pushl 8(%ebp)
+call _class_CChange_method_ComputeRemain
+addl $16, %esp
+pushl %eax
+movl 8(%ebp), %ebx
+movl %eax, 8(%ebx)
 ############################
 # Line 36: Dimes:=ComputeChange(Amt,10)
 ############################
 pushl $10
-pushl _Amt
-call ComputeChange
-addl $8, %esp
-movl %eax, _Dimes
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
+pushl 8(%ebp)
+call _class_CChange_method_ComputeChange
+addl $12, %esp
+pushl %eax
+movl 8(%ebp), %ebx
+movl %eax, 16(%ebx)
 ############################
 # Line 37: if(Dimes>0)then
 # out.writeint(Dimes)
@@ -205,7 +224,9 @@ movl %eax, _Dimes
 # out.writeint(0)
 # endif
 ############################
-pushl _Dimes
+movl 8(%ebp), %ebx
+movl 16(%ebx), %eax
+pushl %eax
 pushl $0
 popl %ebx
 popl %eax
@@ -226,7 +247,9 @@ _doifLine37:
 ############################
 # Line 38: out.writeint(Dimes)
 ############################
-pushl _Dimes
+movl 8(%ebp), %ebx
+movl 16(%ebx), %eax
+pushl %eax
 call writeint
 addl $4, %esp
 jmp _endIfLine37
@@ -241,20 +264,32 @@ _endIfLine37:
 ############################
 # Line 42: Amt:=ComputeRemain(Amt,10,Dimes)
 ############################
-pushl _Dimes
+movl 8(%ebp), %ebx
+movl 16(%ebx), %eax
+pushl %eax
 pushl $10
-pushl _Amt
-call ComputeRemain
-addl $12, %esp
-movl %eax, _Amt
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
+pushl 8(%ebp)
+call _class_CChange_method_ComputeRemain
+addl $16, %esp
+pushl %eax
+movl 8(%ebp), %ebx
+movl %eax, 8(%ebx)
 ############################
 # Line 44: Nickels:=ComputeChange(Amt,5)
 ############################
 pushl $5
-pushl _Amt
-call ComputeChange
-addl $8, %esp
-movl %eax, _Nickels
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
+pushl 8(%ebp)
+call _class_CChange_method_ComputeChange
+addl $12, %esp
+pushl %eax
+movl 8(%ebp), %ebx
+movl %eax, 20(%ebx)
 ############################
 # Line 45: if(Nickels>0)then
 # out.writeint(Nickels)
@@ -262,7 +297,9 @@ movl %eax, _Nickels
 # out.writeint(0)
 # endif
 ############################
-pushl _Nickels
+movl 8(%ebp), %ebx
+movl 20(%ebx), %eax
+pushl %eax
 pushl $0
 popl %ebx
 popl %eax
@@ -283,7 +320,9 @@ _doifLine45:
 ############################
 # Line 46: out.writeint(Nickels)
 ############################
-pushl _Nickels
+movl 8(%ebp), %ebx
+movl 20(%ebx), %eax
+pushl %eax
 call writeint
 addl $4, %esp
 jmp _endIfLine45
@@ -298,18 +337,27 @@ _endIfLine45:
 ############################
 # Line 51: Amt:=ComputeRemain(Amt,5,Nickels)
 ############################
-pushl _Nickels
+movl 8(%ebp), %ebx
+movl 20(%ebx), %eax
+pushl %eax
 pushl $5
-pushl _Amt
-call ComputeRemain
-addl $12, %esp
-movl %eax, _Amt
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
+pushl 8(%ebp)
+call _class_CChange_method_ComputeRemain
+addl $16, %esp
+pushl %eax
+movl 8(%ebp), %ebx
+movl %eax, 8(%ebx)
 ############################
 # Line 53: if(Amt>0)then
 # out.writeint(Amt)
 # endif
 ############################
-pushl _Amt
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
 pushl $0
 popl %ebx
 popl %eax
@@ -330,7 +378,9 @@ _doifLine53:
 ############################
 # Line 54: out.writeint(Amt)
 ############################
-pushl _Amt
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
 call writeint
 addl $4, %esp
 jmp _endIfLine53
@@ -341,5 +391,11 @@ movl -4(%ebp), %eax
 popl %ebp
 ret 
 main:
-call start
+pushl $24
+pushl $1
+call calloc
+addl $8, %esp
+pushl %eax
+call _class_CChange_method_start
+popl %eax
 ret

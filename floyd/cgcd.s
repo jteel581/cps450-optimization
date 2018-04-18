@@ -1,7 +1,3 @@
-.data
-.comm _x, 4, 4
-.comm _y, 4, 4
-.comm _ans, 4, 4
 ############################
 # Line 6: x:int
 ############################
@@ -24,9 +20,9 @@
 ############################
 .text
 .global main
-.global gcd
-.type gcd, @function
-gcd:
+.global _class_Cgcd_method_gcd
+.type _class_Cgcd_method_gcd, @function
+_class_Cgcd_method_gcd:
 pushl %ebp
 movl %esp, %ebp
 subl $4, %esp
@@ -38,7 +34,7 @@ subl $4, %esp
 # gcd:=a
 # endif
 ############################
-pushl 12(%ebp)
+pushl 16(%ebp)
 pushl $0
 popl %ebx
 popl %eax
@@ -59,7 +55,7 @@ _doifLine12:
 ############################
 # Line 13: gcd:=a
 ############################
-pushl 8(%ebp)
+pushl 12(%ebp)
 popl %eax
 movl %eax, -4(%ebp)
 jmp _endIfLine12
@@ -67,10 +63,10 @@ _elseLine12:
 ############################
 # Line 15: a:=gcd(b,a-(a/b)*b)
 ############################
-pushl 8(%ebp)
 pushl 12(%ebp)
+pushl 16(%ebp)
+pushl 16(%ebp)
 pushl 12(%ebp)
-pushl 8(%ebp)
 call divide
 popl %ecx
 popl %ecx
@@ -83,15 +79,16 @@ popl %ebx
 popl %eax
 subl %ebx, %eax
 pushl %eax
-pushl 12(%ebp)
-call gcd
-addl $8, %esp
+pushl 16(%ebp)
+pushl 8(%ebp)
+call _class_Cgcd_method_gcd
+addl $12, %esp
 pushl %eax
-movl %eax, 8(%ebp)
+movl %eax, 12(%ebp)
 ############################
 # Line 16: gcd:=a
 ############################
-pushl 8(%ebp)
+pushl 12(%ebp)
 popl %eax
 movl %eax, -4(%ebp)
 _endIfLine12:
@@ -105,16 +102,16 @@ ret
 # out.writeint(ans)
 # enddisplayres
 ############################
-.global displayres
-.type displayres, @function
-displayres:
+.global _class_Cgcd_method_displayres
+.type _class_Cgcd_method_displayres, @function
+_class_Cgcd_method_displayres:
 pushl %ebp
 movl %esp, %ebp
 subl $4, %esp
 ############################
 # Line 22: out.writeint(ans)
 ############################
-pushl 8(%ebp)
+pushl 12(%ebp)
 call writeint
 addl $4, %esp
 movl %ebp, %esp
@@ -130,9 +127,9 @@ ret
 # displayres(ans)
 # endstart
 ############################
-.global start
-.type start, @function
-start:
+.global _class_Cgcd_method_start
+.type _class_Cgcd_method_start, @function
+_class_Cgcd_method_start:
 pushl %ebp
 movl %esp, %ebp
 subl $4, %esp
@@ -142,33 +139,50 @@ subl $4, %esp
 call readint
 pushl %eax
 popl %eax
-movl %eax, _x
+movl 8(%ebp), %ebx
+movl %eax, 8(%ebx)
 ############################
 # Line 28: y:=in.readint()
 ############################
 call readint
 pushl %eax
 popl %eax
-movl %eax, _y
+movl 8(%ebp), %ebx
+movl %eax, 12(%ebx)
 ############################
 # Line 29: ans:=gcd(x,y)
 ############################
-pushl _y
-pushl _x
-call gcd
-addl $8, %esp
+movl 8(%ebp), %ebx
+movl 12(%ebx), %eax
 pushl %eax
-movl %eax, _ans
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
+pushl 8(%ebp)
+call _class_Cgcd_method_gcd
+addl $12, %esp
+pushl %eax
+movl 8(%ebp), %ebx
+movl %eax, 16(%ebx)
 ############################
 # Line 30: displayres(ans)
 ############################
-pushl _ans
-call displayres
-addl $4, %esp
+movl 8(%ebp), %ebx
+movl 16(%ebx), %eax
+pushl %eax
+pushl 8(%ebp)
+call _class_Cgcd_method_displayres
+addl $8, %esp
 movl %ebp, %esp
 movl -4(%ebp), %eax
 popl %ebp
 ret 
 main:
-call start
+pushl $20
+pushl $1
+call calloc
+addl $8, %esp
+pushl %eax
+call _class_Cgcd_method_start
+popl %eax
 ret

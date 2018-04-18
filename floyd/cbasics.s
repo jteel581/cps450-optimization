@@ -1,5 +1,3 @@
-.data
-.comm _d, 4, 4
 ############################
 # Line 6: d:int
 ############################
@@ -17,9 +15,9 @@
 ############################
 .text
 .global main
-.global meth2
-.type meth2, @function
-meth2:
+.global _class_CBasics_method_meth2
+.type _class_CBasics_method_meth2, @function
+_class_CBasics_method_meth2:
 pushl %ebp
 movl %esp, %ebp
 subl $8, %esp
@@ -30,8 +28,8 @@ movl $0, -8(%ebp)
 ############################
 # Line 11: meth2:=a+b
 ############################
-pushl 8(%ebp)
 pushl 12(%ebp)
+pushl 16(%ebp)
 popl %ebx
 popl %eax
 addl %ebx, %eax
@@ -43,17 +41,17 @@ movl %eax, -4(%ebp)
 ############################
 pushl $10
 popl %eax
-movl %eax, 8(%ebp)
+movl %eax, 12(%ebp)
 ############################
 # Line 13: out.writeint(a)
 ############################
-pushl 8(%ebp)
+pushl 12(%ebp)
 call writeint
 addl $4, %esp
 ############################
 # Line 14: out.writeint(b)
 ############################
-pushl 12(%ebp)
+pushl 16(%ebp)
 call writeint
 addl $4, %esp
 ############################
@@ -76,9 +74,9 @@ ret
 # out.writeint(b)
 # endmeth1
 ############################
-.global meth1
-.type meth1, @function
-meth1:
+.global _class_CBasics_method_meth1
+.type _class_CBasics_method_meth1, @function
+_class_CBasics_method_meth1:
 pushl %ebp
 movl %esp, %ebp
 subl $8, %esp
@@ -91,31 +89,35 @@ movl $0, -8(%ebp)
 ############################
 pushl $-5
 popl %eax
-movl %eax, _d
+movl 8(%ebp), %ebx
+movl %eax, 8(%ebx)
 ############################
 # Line 23: meth1:=meth2(a+b,d)
 ############################
-pushl _d
-pushl 8(%ebp)
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
 pushl 12(%ebp)
+pushl 16(%ebp)
 popl %ebx
 popl %eax
 addl %ebx, %eax
 pushl %eax
-call meth2
-addl $8, %esp
+pushl 8(%ebp)
+call _class_CBasics_method_meth2
+addl $12, %esp
 pushl %eax
 movl %eax, -4(%ebp)
 ############################
 # Line 24: out.writeint(a)
 ############################
-pushl 8(%ebp)
+pushl 12(%ebp)
 call writeint
 addl $4, %esp
 ############################
 # Line 25: out.writeint(b)
 ############################
-pushl 12(%ebp)
+pushl 16(%ebp)
 call writeint
 addl $4, %esp
 movl %ebp, %esp
@@ -140,9 +142,9 @@ ret
 # 
 # endstart
 ############################
-.global start
-.type start, @function
-start:
+.global _class_CBasics_method_start
+.type _class_CBasics_method_start, @function
+_class_CBasics_method_start:
 pushl %ebp
 movl %esp, %ebp
 subl $16, %esp
@@ -191,7 +193,9 @@ addl $4, %esp
 ############################
 # Line 38: out.writeint(d)
 ############################
-pushl _d
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
 call writeint
 addl $4, %esp
 ############################
@@ -199,14 +203,17 @@ addl $4, %esp
 ############################
 pushl -16(%ebp)
 pushl -12(%ebp)
-call meth1
-addl $8, %esp
+pushl 8(%ebp)
+call _class_CBasics_method_meth1
+addl $12, %esp
 pushl %eax
 movl %eax, -8(%ebp)
 ############################
 # Line 40: out.writeint(d)
 ############################
-pushl _d
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
 call writeint
 addl $4, %esp
 ############################
@@ -220,5 +227,11 @@ movl -4(%ebp), %eax
 popl %ebp
 ret 
 main:
-call start
+pushl $12
+pushl $1
+call calloc
+addl $8, %esp
+pushl %eax
+call _class_CBasics_method_start
+popl %eax
 ret

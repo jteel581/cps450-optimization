@@ -1,6 +1,3 @@
-.data
-.comm _num, 4, 4
-.comm _num2, 4, 4
 ############################
 # Line 6: num:int
 ############################
@@ -21,9 +18,9 @@
 ############################
 .text
 .global main
-.global Fact
-.type Fact, @function
-Fact:
+.global _class_CFact_method_Fact
+.type _class_CFact_method_Fact, @function
+_class_CFact_method_Fact:
 pushl %ebp
 movl %esp, %ebp
 subl $8, %esp
@@ -38,7 +35,7 @@ movl $0, -8(%ebp)
 # answer:=num*Fact(num-1)
 # endif
 ############################
-pushl 8(%ebp)
+pushl 12(%ebp)
 pushl $0
 popl %ebx
 popl %eax
@@ -67,16 +64,17 @@ _elseLine12:
 ############################
 # Line 15: answer:=num*Fact(num-1)
 ############################
-pushl 8(%ebp)
+pushl 12(%ebp)
 pushl $1
 popl %ebx
 popl %eax
 subl %ebx, %eax
 pushl %eax
-call Fact
-addl $4, %esp
-pushl %eax
 pushl 8(%ebp)
+call _class_CFact_method_Fact
+addl $8, %esp
+pushl %eax
+pushl 12(%ebp)
 call multiply
 popl %ecx
 popl %ecx
@@ -105,9 +103,9 @@ ret
 # endloop
 # endGo
 ############################
-.global Go
-.type Go, @function
-Go:
+.global _class_CFact_method_Go
+.type _class_CFact_method_Go, @function
+_class_CFact_method_Go:
 pushl %ebp
 movl %esp, %ebp
 subl $8, %esp
@@ -150,11 +148,14 @@ _startwhilebody25:
 call readint
 pushl %eax
 popl %eax
-movl %eax, _num
+movl 8(%ebp), %ebx
+movl %eax, 8(%ebx)
 ############################
 # Line 27: isOk:=(num>=1)
 ############################
-pushl _num
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
 pushl $1
 popl %ebx
 popl %eax
@@ -184,34 +185,44 @@ ret
 # out.writeint(num2)
 # endstart
 ############################
-.global start
-.type start, @function
-start:
+.global _class_CFact_method_start
+.type _class_CFact_method_start, @function
+_class_CFact_method_start:
 pushl %ebp
 movl %esp, %ebp
 subl $4, %esp
 ############################
 # Line 33: Go()
 ############################
-call Go
+pushl 8(%ebp)
+call _class_CFact_method_Go
+addl $8, %esp
 ############################
 # Line 34: num2:=Fact(num)
 ############################
-pushl _num
-call Fact
-addl $4, %esp
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
 pushl %eax
-movl %eax, _num2
+pushl 8(%ebp)
+call _class_CFact_method_Fact
+addl $8, %esp
+pushl %eax
+movl 8(%ebp), %ebx
+movl %eax, 12(%ebx)
 ############################
 # Line 35: out.writeint(num)
 ############################
-pushl _num
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
 call writeint
 addl $4, %esp
 ############################
 # Line 36: out.writeint(num2)
 ############################
-pushl _num2
+movl 8(%ebp), %ebx
+movl 12(%ebx), %eax
+pushl %eax
 call writeint
 addl $4, %esp
 movl %ebp, %esp
@@ -219,5 +230,11 @@ movl -4(%ebp), %eax
 popl %ebp
 ret 
 main:
-call start
+pushl $16
+pushl $1
+call calloc
+addl $8, %esp
+pushl %eax
+call _class_CFact_method_start
+popl %eax
 ret

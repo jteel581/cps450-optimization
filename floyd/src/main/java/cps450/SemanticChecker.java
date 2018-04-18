@@ -62,6 +62,7 @@ public class SemanticChecker extends FloydBaseListener {
 	Integer numErrors = 0;
 	String fileName;
 	Integer localOffset = -8;
+	Integer instanceVarOffset = 8;
 	
 	public SemanticChecker(Options ops) {
 		super();
@@ -155,6 +156,11 @@ public class SemanticChecker extends FloydBaseListener {
 			{
 				decl.setOffSet(localOffset);
 				localOffset -= 4;
+			}
+			else if (st.getScope() == 1)
+			{
+				decl.setOffSet(instanceVarOffset);
+				instanceVarOffset += 4;
 			}
 			
 			Symbol s = st.lookup(name);
@@ -1634,7 +1640,7 @@ public class SemanticChecker extends FloydBaseListener {
 
 	@Override
 	public void exitArgument_decl_list(Argument_decl_listContext ctx) {
-		Integer offSet = 8;
+		Integer offSet = 12;
 		for (Argument_declContext adc : ctx.args)
 		{
 			Symbol s = st.lookup(adc.IDENTIFIER().getText());	
@@ -1710,7 +1716,7 @@ public class SemanticChecker extends FloydBaseListener {
 		//System.out.println("Stack before class exit: \n" + st.toString());
 		
 		st.endScope();
-		localOffset = -8;
+		instanceVarOffset = 8;
 		st.push(className, s.classDecl);
 		//System.out.println("Stack after exit: \n" + st.toString());
 	}

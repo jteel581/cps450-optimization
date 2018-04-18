@@ -1,7 +1,3 @@
-.data
-.comm _num, 4, 4
-.comm _num2, 4, 4
-.comm _isOk, 4, 4
 ############################
 # Line 5: num:int
 ############################
@@ -26,9 +22,9 @@
 ############################
 .text
 .global main
-.global Fact
-.type Fact, @function
-Fact:
+.global _class_CIterfact_method_Fact
+.type _class_CIterfact_method_Fact, @function
+_class_CIterfact_method_Fact:
 pushl %ebp
 movl %esp, %ebp
 subl $8, %esp
@@ -49,7 +45,7 @@ movl %eax, -8(%ebp)
 # endloop
 ############################
 _while13:
-pushl 8(%ebp)
+pushl 12(%ebp)
 pushl $0
 popl %ebx
 popl %eax
@@ -70,7 +66,7 @@ _startwhilebody13:
 ############################
 # Line 14: answer:=answer*num
 ############################
-pushl 8(%ebp)
+pushl 12(%ebp)
 pushl -8(%ebp)
 call multiply
 popl %ecx
@@ -81,14 +77,14 @@ movl %eax, -8(%ebp)
 ############################
 # Line 15: num:=num-1
 ############################
-pushl 8(%ebp)
+pushl 12(%ebp)
 pushl $1
 popl %ebx
 popl %eax
 subl %ebx, %eax
 pushl %eax
 popl %eax
-movl %eax, 8(%ebp)
+movl %eax, 12(%ebp)
 jmp _while13
 _endwhile13:
 ############################
@@ -127,9 +123,9 @@ ret
 # endif
 # endstart
 ############################
-.global start
-.type start, @function
-start:
+.global _class_CIterfact_method_start
+.type _class_CIterfact_method_start, @function
+_class_CIterfact_method_start:
 pushl %ebp
 movl %esp, %ebp
 subl $4, %esp
@@ -139,14 +135,17 @@ subl $4, %esp
 call readint
 pushl %eax
 popl %eax
-movl %eax, _num
+movl 8(%ebp), %ebx
+movl %eax, 8(%ebx)
 ############################
 # Line 24: ifnum>0then
 # num:=Fact(num)
 # out.writeint(num)
 # endif
 ############################
-pushl _num
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
 pushl $0
 popl %ebx
 popl %eax
@@ -167,15 +166,21 @@ _doifLine24:
 ############################
 # Line 25: num:=Fact(num)
 ############################
-pushl _num
-call Fact
-addl $4, %esp
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
 pushl %eax
-movl %eax, _num
+pushl 8(%ebp)
+call _class_CIterfact_method_Fact
+addl $8, %esp
+pushl %eax
+movl 8(%ebp), %ebx
+movl %eax, 8(%ebx)
 ############################
 # Line 26: out.writeint(num)
 ############################
-pushl _num
+movl 8(%ebp), %ebx
+movl 8(%ebx), %eax
+pushl %eax
 call writeint
 addl $4, %esp
 jmp _endIfLine24
@@ -186,5 +191,11 @@ movl -4(%ebp), %eax
 popl %ebp
 ret 
 main:
-call start
+pushl $20
+pushl $1
+call calloc
+addl $8, %esp
+pushl %eax
+call _class_CIterfact_method_start
+popl %eax
 ret
