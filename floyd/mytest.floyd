@@ -1,4 +1,22 @@
-class math is
+class ball is
+	num: int
+	height: int
+	setNum(newNum: int) is
+	begin
+		me.num := newNum
+	end setNum
+	setHeight(newHeight: int) is
+	begin
+		me.height := 
+	
+	init() : ball is
+		ball b := new ball
+		num := 1
+		height := 0
+		
+	bounce() is
+		
+
 	add(x: int; y: int) : int is
 	result: int
 	begin

@@ -25,7 +25,7 @@ public class Options
         ds = false;
         dp = false;
         S = false;
-        filenames.add("stdlib.floyd");
+        //filenames.add("stdlib.floyd");
         if (arguments.length < 1)
         {
             System.out.println("usage:");

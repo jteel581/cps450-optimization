@@ -114,7 +114,7 @@ microterm returns [Type exprType, Symbol sym]
 
 nanoterm returns [Type nanoTermType, Symbol sym]
    : (IDENTIFIER | STRINGLITERAL | INTEGERLITERAL | TRUE | FALSE | NULL | ME) (PERIOD)? exprtail	# RegularNanoterm	
-   | OPENPAREN expression CLOSEPAREN																# ParanNanoterm
+   | OPENPAREN expression CLOSEPAREN (PERIOD)? exprtail																# ParanNanoterm
    ;   
 
 expression returns [Type exprType, Symbol sym]
@@ -131,7 +131,7 @@ exprtail returns [Type exprTailType, Symbol sym]
    : IDENTIFIER OPENPAREN (expression_list)? CLOSEPAREN exprtail	# RegularExprTail
    |																# EmptyExprTail
    ;
-call_stmt 
+call_stmt returns [Symbol sym]
    : (expression PERIOD)? IDENTIFIER OPENPAREN (expression_list)? CLOSEPAREN	
    ;
 

@@ -210,7 +210,7 @@ public class Main
                 				generator.sortInstructions();
                 			}
                     		generator.outputAssembly();
-                    		String fileName = ops.getFileNames().get(1);
+                    		String fileName = ops.getFileNames().get(0);
                     		fileName = fileName.replace(".floyd", ".s");
                     		String stdLib = "stdlib.c";
                     		String exeName = "-o" + fileName.replace(".s", "");

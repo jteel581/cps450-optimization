@@ -1,0 +1,9 @@
+class readtest is
+	start() is
+	begin
+	out.writeint(in.readint())
+	out.writeint(in.readint())
+	out.writeint(in.readint() + in.readint())
+	end start
+	
+end readtest

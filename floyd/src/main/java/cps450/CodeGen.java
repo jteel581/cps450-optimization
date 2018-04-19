@@ -76,7 +76,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		boolean firstData = true;
 		boolean firstText = true;
 		//String fileName = ops.getFileNames().get(0);
-		String fileName = ops.getFileNames().get(1);
+		String fileName = ops.getFileNames().get(0);
 		fileName = fileName.replace(".floyd", ".s");
 		File assemblyFile = new File(fileName);
 		if(!assemblyFile.exists())
@@ -324,7 +324,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 
 	@Override
 	public Double visitClass_decl(Class_declContext ctx) {
-		// TODO Auto-generated method stub
 		lastClass = ctx.id1.getText();
 		cdx = ctx;
 		
@@ -532,7 +531,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 	
 	
 
-	public Class_declContext getClassFromMethod(ParserRuleContext csx)
+	public static Class_declContext getClassFromMethod(ParserRuleContext csx)
 	{
 		Class_declContext cdx = null;
 		ParserRuleContext prc = csx.getParent();
@@ -576,6 +575,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			
 			Class_declContext cdx = getClassFromMethod(ctx);
 			String className = cdx.id1.getText();
+			
 			methodName = "_class_" + className + "_method_" + methodName; 
 			// call that looks like boo()
 			if (ctx.expression() == null || (ctx.expression() != null && ctx.expression().getText().equals("")))
@@ -607,6 +607,12 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			// call that looks like foo.boo()
 			else
 			{
+				Symbol sym = ctx.sym;
+				className = "";
+				
+				className = sym.varDecl.type.name;
+				methodName = ctx.IDENTIFIER().getText();
+				methodName = "_class_" + className + "_method_" + methodName; 
 				if (!ctx.expression_list().getText().equals(""))
 				{
 					for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
@@ -615,17 +621,94 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 					}
 					// code to push foo part of call
 					// ask schaub if this is correct
+					
+
+					
+					if (sym.scopeNum == LOCAL)
+					{
+						Integer offset;
+						if (sym.varDecl != null )
+						{
+							offset = sym.varDecl.offSet;
+
+						}
+						else
+							
+						{
+							offset = -4;
+						}
+						emit("pushl", offset + "(%ebp)");
+					}
+					else if (sym.scopeNum == CLASS)
+					{
+						emit("movl", "8(%ebp)", "%ebx");
+
+						emit("movl", sym.varDecl.offSet + "(%ebx)", "%eax" );
+						emit("pushl", "%eax");
+					}
+					else
+					{
+						String label = "";
+						label = ctx.IDENTIFIER().toString();
+						emit("pushl", "_" + label);
+					}
 					emit("call", methodName);
 					emit("addl","$" + paramsSize, "%esp" );
 
 				}
 				else // no params
 				{
+					
+					
+					
+					if (sym.scopeNum == LOCAL)
+					{
+						Integer offset;
+						if (sym.varDecl != null )
+						{
+							offset = sym.varDecl.offSet;
+
+						}
+						else
+							
+						{
+							offset = -4;
+						}
+						emit("pushl", offset + "(%ebp)");
+					}
+					else if (sym.scopeNum == CLASS)
+					{
+						emit("movl", "8(%ebp)", "%ebx");
+
+						emit("movl", sym.varDecl.offSet + "(%ebx)", "%eax" );
+						emit("pushl", "%eax");
+					}
+					else
+					{
+						String label = "";
+						label = ctx.IDENTIFIER().toString();
+						emit("pushl", "_" + label);
+					}
 					emit("call", methodName);
+					emit("addl","$4", "%esp" );
+
 				}
 			}
 			break;
 				
+		}
+		return null;
+	}
+	
+	@Override
+	public Double visitParanNanoterm(ParanNanotermContext ctx) {
+		String exprtailStr = ctx.exprtail().getText();
+		visit(ctx.expression());
+
+		if (!exprtailStr.equals(""))
+		{
+			emit("popl", "%eax");
+			visit(ctx.exprtail());
 		}
 		return null;
 	}
@@ -664,29 +747,134 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			Integer paramsSize = numParams * 4;
 			// call that looks like boo()
 			// if there are params
-			if (!ctx.expression_list().getText().equals(""))
+			String parentString = ctx.getParent().getText();
+			Symbol s = ctx.sym;
+			if (s.classDecl == null && s.methodDecl != null)
 			{
-				for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
+				if (!ctx.expression_list().getText().equals(""))
 				{
-					visit(ctx.expression_list().expression(i));
+					for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
+					{
+						visit(ctx.expression_list().expression(i));
+					}
+					// ask schaub if this is correct
+					// code to push me goes here
+					emit("pushl", "8(%ebp)");
+					paramsSize += 4;
+					emit("call", methodName);
+					
+					emit("addl","$" + paramsSize, "%esp" );
+					
 				}
-				// ask schaub if this is correct
-				// code to push me goes here
-				emit("pushl", "8(%ebp)");
-				paramsSize += 4;
-				emit("call", methodName);
-				
-				emit("addl","$" + paramsSize, "%esp" );
-				
-			}
-			// if there are not params
-			else 
-			{
-				emit("pushl", "8(%ebp)");
+				// if there are not params
+				else 
+				{
+					emit("pushl", "8(%ebp)");
 
-				emit("call", methodName);
-				paramsSize += 4;
-				emit("addl","$" + paramsSize, "%esp" );			}
+					emit("call", methodName);
+					paramsSize += 4;
+					emit("addl","$" + paramsSize, "%esp" );			
+				}
+			}
+			else
+			{
+				Symbol sym = ctx.sym;
+				className = "";
+				className = sym.classDecl.className;
+				methodName = ctx.IDENTIFIER().getText();
+				methodName = "_class_" + className + "_method_" + methodName; 
+				if (!ctx.expression_list().getText().equals(""))
+				{
+					for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
+					{
+						visit(ctx.expression_list().expression(i));
+					}
+					// code to push foo part of call
+					// ask schaub if this is correct
+					
+
+					paramsSize = paramsSize + 4;
+					if (sym.scopeNum == LOCAL)
+					{
+						Integer offset;
+						if (sym.varDecl != null )
+						{
+							offset = sym.varDecl.offSet;
+
+						}
+						else
+							
+						{
+							offset = -4;
+						}
+						emit("pushl", offset + "(%ebp)");
+					}
+					else if (sym.scopeNum == CLASS)
+					{
+						emit("movl", "8(%ebp)", "%ebx");
+
+						emit("movl", sym.varDecl.offSet + "(%ebx)", "%eax" );
+						emit("pushl", "%eax");
+					}
+					else if (sym.classDecl != null)
+					{
+						emit("pushl", "%eax");
+					}
+					else
+					{
+						String label = "";
+						label = ctx.IDENTIFIER().toString();
+						emit("pushl", "_" + label);
+					}
+					emit("call", methodName);
+					emit("addl","$" + paramsSize, "%esp" );
+
+				}
+				else // no params
+				{
+					
+								
+					if (sym.scopeNum == LOCAL)
+					{
+						Integer offset;
+						if (sym.varDecl != null )
+						{
+							offset = sym.varDecl.offSet;
+
+						}
+						else
+							
+						{
+							offset = -4;
+						}
+						emit("pushl", offset + "(%ebp)");
+					}
+					else if (sym.scopeNum == CLASS)
+					{
+						emit("movl", "8(%ebp)", "%ebx");
+
+						emit("movl", sym.varDecl.offSet + "(%ebx)", "%eax" );
+						emit("pushl", "%eax");
+					}
+					else
+					{
+						String label = "";
+						label = ctx.IDENTIFIER().toString();
+						emit("pushl", "_" + label);
+					}
+					emit("call", methodName);
+					emit("addl","$4", "%esp" );
+
+				}
+			}
+			
+			
+			
+				
+			
+
+			
+			
 			// call that looks like foo.boo
 			
 			
@@ -745,7 +933,31 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 					emit("call", methodName);
 				}
 			}*/
-			if (ctx.sym.methodDecl.returnType != Type.VOID)
+			if (ctx.sym.methodDecl == null && ctx.sym.classDecl != null)
+			{
+				Symbol sym = ctx.sym;
+				ClassDecl cd = sym.classDecl;
+				MethodDecl md = null;
+				methodName = "";
+				methodName = ctx.IDENTIFIER().getText();
+				for (int i = 0; i < cd.methods.size(); i++)
+				{
+					MethodDecl mdl = cd.methods.get(i);
+					if (mdl.methodName.equals(methodName))
+					{
+						md = mdl;
+						break;
+					}
+				}
+				if (md != null && md.returnType != Type.VOID)
+				{
+					emit("pushl", "%eax");
+
+				}
+				
+			}
+			
+			else if (ctx.sym.methodDecl != null && ctx.sym.methodDecl.returnType != Type.VOID)
 			{
 				emit("pushl", "%eax");
 
@@ -815,11 +1027,11 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			}
 			else if (ctx.NULL() != null)
 			{
-				// phase 5
+				emit("pushl", "$0");
 			}
 			else if (ctx.ME() != null)
 			{
-				// phase 5
+				emit("pushl", "8(%ebp)");
 			}
 		}
 		else 
@@ -833,8 +1045,32 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 
 	@Override
 	public Double visitNewTypeExpression(NewTypeExpressionContext ctx) {
-		// phase 5
-		return super.visitNewTypeExpression(ctx);
+		ClassDecl cd = ctx.sym.classDecl;
+		
+		
+		int numOfVars = cd.variables.size();
+		int sizeToAlloc = numOfVars * 4;
+		sizeToAlloc += 8;
+		emit("pushl", "$" + sizeToAlloc);
+		emit("pushl", "$1");
+		emit("call", "calloc");
+		emit("addl", "$8", "%esp");
+		emit("pushl", "%eax");
+		/*
+		pw.println("main:");
+		
+		pw.println("pushl $" + sizeToAlloc);
+		pw.println("pushl $1");
+		pw.println("call calloc");
+		pw.println("addl $8, %esp");
+		pw.println("pushl %eax");
+		pw.println("call _class_" + lastClass + "_method_start");
+		pw.println("popl %eax");
+		pw.println("ret");
+		pw.close();
+		*/
+		return null;
+		//return super.visitNewTypeExpression(ctx);
 	}
 
 
@@ -864,7 +1100,14 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 
 	@Override
 	public Double visitParenthesizedExpression(ParenthesizedExpressionContext ctx) {
+		String exprtailStr = ctx.exprtail().getText();
 		visit(ctx.expression());
+
+		if (!exprtailStr.equals(""))
+		{
+			emit("popl", "%eax");
+			visit(ctx.exprtail());
+		}
 		
 		return null;
 	}
@@ -1231,11 +1474,11 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			}
 			else if (ctx.NULL() != null)
 			{
-				// phase 5
+				emit("pushl", "$0");
 			}
 			else if (ctx.ME() != null)
 			{
-				// phase 5
+				// - me is not permitted
 			}
 		}
 		
@@ -1336,11 +1579,11 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			}
 			else if (ctx.NULL() != null)
 			{
-				// phase 5
+				emit("pushl", "$0");
 			}
 			else if (ctx.ME() != null)
 			{
-				// phase 5
+				emit("pushl", "8(%ebp)");
 			}
 		}
 		
@@ -1414,11 +1657,11 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			}
 			else if (ctx.NULL() != null)
 			{
-				// phase 5
+				emit("pushl", "$0");
 			}
 			else if (ctx.ME() != null)
 			{
-				// phase 5
+				emit("pushl", "8(%ebp)");
 			}
 		}
 		
@@ -1426,11 +1669,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 	}
 
 
-	@Override
-	public Double visitParanNanoterm(ParanNanotermContext ctx) {
-		visit(ctx.expression());
-		return null;
-	}
+	
 	
 	
 	

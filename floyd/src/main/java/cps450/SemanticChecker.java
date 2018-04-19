@@ -69,7 +69,7 @@ public class SemanticChecker extends FloydBaseListener {
 		this.ops = ops;
 		this.st = SymbolTable.getInstance();
 		this.handyMan = new SemanticErrorHandler();
-		this.fileName = ops.getFileNames().get(1);
+		this.fileName = ops.getFileNames().get(0);
 	}
 	
 	
@@ -145,9 +145,10 @@ public class SemanticChecker extends FloydBaseListener {
 			}
 			else 
 			{
-				ctx.varDeclType = Type.ERROR;
-				t = Type.ERROR;
-				typeStr = "<error>";
+				
+				ctx.varDeclType = Type.getTypeForName(ctx.type().getText());
+				t = ctx.varDeclType;
+				typeStr = ctx.type().getText();
 			}
 			//System.out.println("type is " + typeStr);
 			//Type t = new Type(typeStr);
@@ -238,8 +239,16 @@ public class SemanticChecker extends FloydBaseListener {
 			//System.out.println("symbolType is " + symbolType.name);
 			if ((varType != symbolType) && (symbolType != Type.ERROR))
 			{
-				
-				handyMan.reportError(fileName, ctx, SemanticError.TYPEMISMATCH, symbolType.toString(), varType.toString());
+				if (symbolType == null)
+				{
+					handyMan.reportError(fileName, ctx, SemanticError.TYPEMISMATCH, "null", varType.toString());
+
+				}
+				else if (!varType.name.equals(symbolType.name))
+				{
+					handyMan.reportError(fileName, ctx, SemanticError.TYPEMISMATCH, symbolType.toString(), varType.toString());
+
+				}
 			}
 			//System.out.println("varType is " + varType.name);
 			
@@ -415,8 +424,30 @@ public class SemanticChecker extends FloydBaseListener {
 		}
 		else if (ctx.ME() != null)
 		{
-			ctx.exprType = Type.ERROR;
-			handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
+			if (dealWithExprTail(ctx))
+			{
+				ctx.exprType = ctx.exprtail().exprTailType;
+				return;
+			}
+			else
+			{
+				Class_declContext cdx = CodeGen.getClassFromMethod(ctx);
+				String className = cdx.id1.getText();
+				
+				Type t = Type.getTypeForName(className);
+				ctx.exprType = t;
+				return;
+			}
+			
+			//handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
+		}
+		else if (ctx.NULL() != null)
+		{
+			if (dealWithExprTail(ctx))
+			{
+				handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
+			}
+			ctx.exprType = Type.NULL;
 			return;
 		}
 		else 
@@ -876,9 +907,24 @@ public class SemanticChecker extends FloydBaseListener {
 		}
 		else if (ctx.ME() != null)
 		{
-			ctx.exprType = Type.ERROR;
-			handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
-			return;
+			
+			if (dealWithExprTail(ctx))
+			{
+				ctx.exprType = ctx.exprtail().exprTailType;
+				return;
+			}
+			else
+			{
+				Class_declContext cdx = CodeGen.getClassFromMethod(ctx);
+				String className = cdx.id1.getText();
+				
+				Type t = Type.getTypeForName(className);
+				Symbol s = st.lookup(className);
+				ctx.exprType = t;
+				ctx.sym = s;
+				return;
+			}
+			
 		}
 		else 
 		{
@@ -972,6 +1018,14 @@ public class SemanticChecker extends FloydBaseListener {
 		{
 			handyMan.reportError(fileName, ctx, SemanticError.UNDECLAREDVAR);
 		}
+		else if (s.methodDecl != null)
+		{
+			ctx.ttype = s.methodDecl.returnType;
+		}
+		else if (s.classDecl != null)
+		{
+			ctx.ttype = s.classDecl.type;
+		}
 		else
 		{
 			
@@ -983,9 +1037,11 @@ public class SemanticChecker extends FloydBaseListener {
 	
 	@Override
 	public void exitNewTypeExpression(NewTypeExpressionContext ctx) {
-		
-			ctx.exprType = Type.ERROR;
-			handyMan.reportError(ops.getFileNames().toString(), ctx, SemanticError.UNSUPPORTED);
+			String typeName = ctx.type().getText();
+			Type t = Type.getTypeForName(typeName);
+			ctx.exprType = t;
+			ctx.sym = st.lookup(typeName);
+			//handyMan.reportError(ops.getFileNames().toString(), ctx, SemanticError.UNSUPPORTED);
 		
 		
 	}
@@ -1070,8 +1126,19 @@ public class SemanticChecker extends FloydBaseListener {
 
 		}
 	}
+	
+	
+	
+	
 
 	
+
+
+	@Override
+	public void exitParanNanoterm(ParanNanotermContext ctx) {
+		ctx.nanoTermType = ctx.expression().exprType;
+	}
+
 
 
 	@Override
@@ -1105,7 +1172,7 @@ public class SemanticChecker extends FloydBaseListener {
 			Symbol s = st.lookup(identifier);
 			if ( s != null)
 			{
-				ctx.sym = s;
+				ctx.sym = s; // sym is the method itself
 
 				Type t;
 				if (s.varDecl != null)
@@ -1170,11 +1237,75 @@ public class SemanticChecker extends FloydBaseListener {
 		else
 		{
 			String className = ctx.getParent().getStart().getText();
-			Symbol s = st.lookup(className);
-			ClassDecl cd = s.classDecl;
-			// this only works for the methods readint and writeint, more needed to get more methods
-			MethodDecl md = cd.methods.get(0);
-			ctx.exprTailType = md.returnType;
+			if (className.equals("("))
+			{
+				className = ctx.getParent().getChild(1).getText();
+				className = className.replace("new", "");
+			}
+			if (className.contains("\""))
+			{
+				handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
+				ctx.exprTailType = Type.ERROR;
+			}
+			else
+			{
+				String methodName = ctx.IDENTIFIER().getText();
+				//String className = cdx.id1.getText();
+				Symbol s = st.lookup(className);
+				ctx.sym = s; // s is the class
+				if (s == null)
+				{
+					handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
+					ctx.exprTailType = Type.ERROR;
+				}
+				else
+				{
+					ClassDecl cd = s.classDecl;
+					if (cd == null)
+					{
+						handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
+						ctx.exprTailType = Type.ERROR;
+
+					}
+					else
+					{
+						MethodDecl md = null;
+						if (cd.methods == null)
+						{
+							handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
+							ctx.exprTailType = Type.ERROR;
+
+						}
+						else
+						{
+							for (int i = 0; i < cd.methods.size(); i++)
+							{
+								MethodDecl mdl = cd.methods.get(i);
+								if (mdl.methodName.equals(methodName))
+								{
+									md = mdl;
+									break;
+								}
+							}
+							
+							if (md == null)
+							{
+								handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
+
+							}
+							else
+							{
+								ctx.exprTailType = md.returnType;
+
+							}
+						}
+						
+					}
+				}
+				
+				
+			}
+			
 		}
 		
 	}
@@ -1378,9 +1509,22 @@ public class SemanticChecker extends FloydBaseListener {
 		}
 		else if (ctx.ME() != null)
 		{
-			ctx.nanoTermType = Type.ERROR;
-			handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
-			return;
+			if (dealWithExprTail(ctx))
+			{
+				ctx.nanoTermType = ctx.exprtail().exprTailType;
+				return;
+			}
+			else
+			{
+				Class_declContext cdx = CodeGen.getClassFromMethod(ctx);
+				String className = cdx.id1.getText();
+				
+				Type t = Type.getTypeForName(className);
+				Symbol s = st.lookup(className);
+				ctx.nanoTermType = t;
+				ctx.sym = s;
+				return;
+			}
 		}
 		else 
 		{
@@ -1395,10 +1539,7 @@ public class SemanticChecker extends FloydBaseListener {
 
 
 
-	@Override
-	public void exitParanNanoterm(ParanNanotermContext ctx) {
-		ctx.nanoTermType = ctx.expression().exprType;
-	}
+	
 
 
 
@@ -1472,7 +1613,7 @@ public class SemanticChecker extends FloydBaseListener {
 		s.setName(ctx.id1.getText());
 		ClassDecl cd = new ClassDecl(ctx.id1.getText(), null, null);
 		//s.classDecl = cd;
-		st.push(s.getName());
+		st.push(s.getName(), cd);
 		Type.createType(cd);
 		st.beginScope();
 	}
@@ -1528,6 +1669,7 @@ public class SemanticChecker extends FloydBaseListener {
 		{
 			handyMan.reportError(fileName, ctx, SemanticError.NOSTARTMETHOD);
 		}
+		numErrors = handyMan.numErrors;
 		// old way, before allowing multiple classes
 		/*
 		if (classNum != 1)
@@ -1753,6 +1895,8 @@ public class SemanticChecker extends FloydBaseListener {
 			Symbol s = st.lookup(methodBeingCalled);
 			if (s != null)
 			{
+				//ctx.sym = s;
+
 				if (s.methodDecl != null)
 				{
 					// check for method variables
@@ -1801,7 +1945,8 @@ public class SemanticChecker extends FloydBaseListener {
 			}
 			else
 			{
-				//ctx.returnType = Type.ERROR;
+				handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
+				
 			}
 			
 		}
@@ -1812,6 +1957,8 @@ public class SemanticChecker extends FloydBaseListener {
 			Symbol s = st.lookup(className);
 			if (s != null)
 			{
+				ctx.sym = s;
+
 				if (s.classDecl != null)
 				{
 					// check for method variables

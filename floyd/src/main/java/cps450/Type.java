@@ -10,9 +10,10 @@ public class Type {
 			VOID = new Type("void"),
 			INT = new Type("int"),
 			BOOLEAN = new Type("boolean"),
-			STRING = new Type("string");
+			STRING = new Type("string"),
+			NULL = new Type("null");
 	protected String name;
-	private static HashMap<String, Type> types;
+	private static HashMap<String, Type> types = new HashMap<>();
 	ClassDecl classDecl;
 	
 	public static Type createType(ClassDecl cd)
@@ -38,7 +39,7 @@ public class Type {
 	protected Type(String name) 
 	{
 		this.name = name;
-		types = new HashMap<>();
+		//types = new HashMap<>();
 	}
 	@Override
 	public String toString() {
