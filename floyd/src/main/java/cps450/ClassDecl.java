@@ -1,3 +1,5 @@
+// ClassDecl.java
+// This file holds the ClassDecl class which inherits from the Declaration class.
 package cps450;
 
 import java.util.ArrayList;
@@ -7,6 +9,8 @@ public class ClassDecl extends Declaration {
 	String superClassName;
 	ArrayList<VarDecl> variables;
 	ArrayList<MethodDecl> methods;
+	
+	// These are a couple of constructors for the ClassDecl class, one for classes that inherit, the other, for classes that do not inherit.
 	public ClassDecl(String className, String superClassName, ArrayList<VarDecl> variables,
 			ArrayList<MethodDecl> methods) {
 		super(Type.VOID);

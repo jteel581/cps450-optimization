@@ -1,3 +1,5 @@
+// CodeGen.java
+// This file holds the CodeGen class and all of it's logic.
 package cps450;
 
 import java.io.BufferedReader;
@@ -51,9 +53,8 @@ import cps450.FloydParser.Var_declContext;
 public class CodeGen extends FloydBaseVisitor<Double> {
 	
 	
-	
+	// This is a constructor for the CodeGen class
 	public CodeGen(Options ops) {
-		//super();
 		this.ops = ops;
 	}
 
@@ -70,12 +71,11 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 	
 	
 	
-	
+	// This method creates a file and places the assembly instrucitons inside it.
 	public void outputAssembly() throws IOException
 	{
 		boolean firstData = true;
 		boolean firstText = true;
-		//String fileName = ops.getFileNames().get(0);
 		String fileName = ops.getFileNames().get(0);
 		fileName = fileName.replace(".floyd", ".s");
 		File assemblyFile = new File(fileName);
@@ -88,53 +88,37 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		PrintWriter pw = new PrintWriter(fileName);
 		for (TargetInstruction ti : instructions)
 		{
-			// printing right now, will send to file later
-			// comment
+
 			if (ti.comment != null)
 			{
 				pw.print(ti.comment);
-				//System.out.print(ti.comment);
 			}
-			// code
 			else
 			{
-				// checking if .data has been printed yet, if not, we print
 				if (firstData && ti.directive.equals(".data"))
 				{
 					pw.println(".data");
-					//System.out.println(".data");
 					firstData = false;
 				}
-				// if data is done, we print .text and begin printing that code
 				else if (firstText && ti.directive.equals(".text"))
 				{
 					pw.println(".text");
 					
 					pw.println(".global main");
 						
-					
-					
-					/*
-					System.out.println(".text");
-					System.out.println(".global main");
-					System.out.println("main:");*/
 					firstText = false;
 				}
 				if (ti.instruction != null && ti.label != null)
 				{
 					pw.println(ti.instruction + " " + ti.label);
-					//System.out.println(ti.instruction + " " + ti.label);
-
 				}
 				else if (ti.instruction != null && ti.operand1 != null && ti.operand2 != null)
 				{
 					pw.println(ti.instruction + " " + ti.operand1 + ", " + ti.operand2);
-					//System.out.println(ti.instruction + " " + ti.operand1 + ", " + ti.operand2);
 				}
 				else if (ti.label != null)
 				{
 					pw.println(ti.label);
-					//System.out.println(ti.label);
 				}
 				else 
 				{
@@ -157,10 +141,9 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		pw.println("popl %eax");
 		pw.println("ret");
 		pw.close();
-		//System.out.println("ret");
 	}
 	
-	
+	// This method checks to see if all of the .data directive instructions are together.
 	public boolean checkForGap()
 	{
 		Integer lastDataFound = 0;
@@ -186,7 +169,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		return false;
 	}
 	
-	
+	// This method puts all of the global variable declarations at the top in a .data directive
 	public void sortInstructions()
 	{
 		ArrayList<TargetInstruction> varDecls = new ArrayList<>();
@@ -216,7 +199,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		instructions = updatedInstructions;
 	}
 	
-	
+	// These emit methods store an instruction, lable, or comment in AT&T x86 Assembly Language in a data structure for later use.
 	public void emit(String instruction, String label)
 	{
 		TargetInstruction targetInstruction = new TargetInstruction();
@@ -225,7 +208,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		String comStr = ".comm";
 		String dataDirectiveStr = ".data";
 		String textDirectiveStr = ".text";
-		// variable declaration (only works for int and boolean, next phase will deal with string)
 		if (instruction.equals(comStr))
 		{
 			targetInstruction.directive = dataDirectiveStr;
@@ -262,7 +244,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		targetInstruction.operand2 = operand2;
 		instructions.add(targetInstruction);
 	}
-	
+	// This method generates the line by line comments
 	public String generateComment(ParserRuleContext ctx)
 	{
 		String comment = "";
@@ -350,8 +332,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		emit("pushl", "%ebp");
 		emit("movl", "%esp", "%ebp");
 		Integer numLocals = 0;
-		//visit(ctx.argument_decl_list());
-		// probably visit(arg_decl_list)
 		for (Var_declContext vdc : ctx.vars)
 		{
 			numLocals += 1;
@@ -389,30 +369,13 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		String fullComment = generateComment(ctx);
 		emitComment(fullComment);
 		visit(ctx.e2);
-		// check if right side is a method call
 		boolean rightSideIsMethod = false;
 		Symbol s = ctx.sym;
 
 		Symbol sym = ctx.e2.sym;
 		if (sym != null && sym.methodDecl != null && sym.methodDecl.methodDecl)
 		{
-			//s = ctx.sym;
-			
 			rightSideIsMethod = true;
-			/*
-			Integer offset;
-			if (s.varDecl != null )
-			{
-				offset = s.varDecl.offSet;
-
-			}
-			else
-				
-			{
-				offset = -4;
-			}
-			emit("movl", "%eax",  offset + "(%ebp)" );
-			*/
 		}
 		if (s != null && s.scopeNum == LOCAL)
 		{
@@ -445,7 +408,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			}
 			emit("movl", "8(%ebp)", "%ebx");
 			emit("movl", "%eax" , s.varDecl.offSet + "(%ebx)");
-			//emit("pushl", "%eax");
 		}
 		else
 		{
@@ -559,13 +521,10 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			emit("call", "readint");
 			break;
 		case "writeint": 
-			//visit(ctx.expression_list().expression(0));
 			for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
 			{
 				visit(ctx.expression_list().expression(i));
 			}
-			// ask schaub if this is correct
-			// code to push me goes here
 			emit("call", methodName);
 			
 			emit("addl","$" + paramsSize, "%esp" );
@@ -587,8 +546,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 					{
 						visit(ctx.expression_list().expression(i));
 					}
-					// ask schaub if this is correct
-					// code to push me goes here
 					emit("pushl", "8(%ebp)");
 
 					emit("call", methodName);
@@ -619,11 +576,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 					{
 						visit(ctx.expression_list().expression(i));
 					}
-					// code to push foo part of call
-					// ask schaub if this is correct
-					
-
-					
 					if (sym.scopeNum == LOCAL)
 					{
 						Integer offset;
@@ -731,7 +683,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		{
 		case "readint":
 			emit("call", "readint");
-			// added this line here and not in call statement because here the value is necessary
 			emit("pushl", "%eax");
 			break;
 		case "writeint": 
@@ -757,8 +708,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 					{
 						visit(ctx.expression_list().expression(i));
 					}
-					// ask schaub if this is correct
-					// code to push me goes here
 					emit("pushl", "8(%ebp)");
 					paramsSize += 4;
 					emit("call", methodName);
@@ -789,10 +738,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 					{
 						visit(ctx.expression_list().expression(i));
 					}
-					// code to push foo part of call
-					// ask schaub if this is correct
-					
-
 					paramsSize = paramsSize + 4;
 					if (sym.scopeNum == LOCAL)
 					{
@@ -867,72 +812,7 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 
 				}
 			}
-			
-			
-			
-				
-			
-
-			
-			
 			// call that looks like foo.boo
-			
-			
-			
-			
-			
-			
-			/*
-			NormalExpressionContext ec = (NormalExpressionContext) ctx.getParent();
-			String classReferenced = "";
-			if (ec.IDENTIFIER() != null)
-			{
-				classReferenced = ec.IDENTIFIER().getText();
-			}
-			
-			// if (ctx.parent.getChild(0))
-			if (classReferenced.equals(""))
-			{
-				// if there are params
-				if (!ctx.expression_list().getText().equals(""))
-				{
-					for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
-					{
-						visit(ctx.expression_list().expression(i));
-					}
-					// ask schaub if this is correct
-					// code to push me goes here
-					emit("call", methodName);
-					
-					emit("addl","$" + paramsSize, "%esp" );
-				}
-				// if there are not params
-				else 
-				{
-					emit("call", methodName);
-				}
-			}
-			// call that looks like foo.boo()
-			else
-			{
-				// if there are params
-				if (!ctx.expression_list().getText().equals(""))
-				{
-					for (int i = ctx.expression_list().exprs.size() - 1; i > -1; i--)
-					{
-						visit(ctx.expression_list().expression(i));
-					}
-					// code to push foo part of call
-					// ask schaub if this is correct
-					emit("call", methodName);
-					emit("addl","$" + paramsSize, "%esp" );
-
-				}
-				else
-				{
-					emit("call", methodName);
-				}
-			}*/
 			if (ctx.sym.methodDecl == null && ctx.sym.classDecl != null)
 			{
 				Symbol sym = ctx.sym;
@@ -970,8 +850,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 
 	@Override
 	public Double visitNormalExpression(NormalExpressionContext ctx) {
-		//String fullComment = generateComment(ctx);
-		//emit(fullComment);
 		String exprTailStr = ctx.exprtail().getText();
 		if (exprTailStr.equals(""))
 		{
@@ -1010,7 +888,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			}
 			else if (ctx.STRINGLITERAL() != null)
 			{
-				// implemented in phase 5
 			}
 			else if (ctx.INTEGERLITERAL() != null)
 			{
@@ -1056,28 +933,12 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 		emit("call", "calloc");
 		emit("addl", "$8", "%esp");
 		emit("pushl", "%eax");
-		/*
-		pw.println("main:");
-		
-		pw.println("pushl $" + sizeToAlloc);
-		pw.println("pushl $1");
-		pw.println("call calloc");
-		pw.println("addl $8, %esp");
-		pw.println("pushl %eax");
-		pw.println("call _class_" + lastClass + "_method_start");
-		pw.println("popl %eax");
-		pw.println("ret");
-		pw.close();
-		*/
 		return null;
-		//return super.visitNewTypeExpression(ctx);
 	}
 
 
 	@Override
 	public Double visitOrExpression(OrExpressionContext ctx) {
-		//String fullMessage = generateComment(ctx);
-		//emit(fullMessage);
 		visit(ctx.expression());
 		visit(ctx.factor());
 		emit("popl", "%ebx");
@@ -1092,8 +953,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 	@Override
 	public Double visitFactorExpression(FactorExpressionContext ctx) {
 		visit(ctx.factor());
-		// may not be correct; bug
-		// emit("pushl", "%eax");
 		return null;
 	}
 
@@ -1265,7 +1124,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 
 	@Override
 	public Double visitConcatNybbleBbyte(ConcatNybbleBbyteContext ctx) {
-		// phase 5
 		return super.visitConcatNybbleBbyte(ctx);
 	}
 
@@ -1321,7 +1179,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 
 	@Override
 	public Double visitMulOpMicrotermTerm(MulOpMicrotermTermContext ctx) {
-		// visit in inverse order since i am using 'call'
 		visit(ctx.microterm());
 		visit(ctx.term());
 		String operator = ctx.mul_op().getText();
@@ -1345,7 +1202,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 
 	@Override
 	public Double visitMulOPExpressionTerm(MulOPExpressionTermContext ctx) {
-		// visit in inverse order since i am using 'call'
 				visit(ctx.expression());
 				visit(ctx.term());
 				String operator = ctx.mul_op().getText();
@@ -1443,7 +1299,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			}
 			else if (ctx.STRINGLITERAL() != null)
 			{
-				// implemented in phase 5
 			}
 			else if (ctx.INTEGERLITERAL() != null)
 			{
@@ -1478,7 +1333,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			}
 			else if (ctx.ME() != null)
 			{
-				// - me is not permitted
 			}
 		}
 		
@@ -1562,7 +1416,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			}
 			else if (ctx.STRINGLITERAL() != null)
 			{
-				// implemented in phase 5
 			}
 			else if (ctx.INTEGERLITERAL() != null)
 			{
@@ -1640,7 +1493,6 @@ public class CodeGen extends FloydBaseVisitor<Double> {
 			}
 			else if (ctx.STRINGLITERAL() != null)
 			{
-				// implemented in phase 5
 			}
 			else if (ctx.INTEGERLITERAL() != null)
 			{

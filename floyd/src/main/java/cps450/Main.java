@@ -22,6 +22,8 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main
 {  
+	// This method ended up not being used because I didn't impliment the entire B version, but its purpose is to combine the stdlib.floyd file 
+	// with the file that the user entered in order to run the compiler on both of them.
 	public static boolean combineFiles(Options ops) throws IOException
 	{
 		String fileName = ops.getFileNames().get(1);
@@ -56,106 +58,10 @@ public class Main
 		
 	}
 	
-	
-    public static void main(String[] arguments) throws IOException, InterruptedException {
-        Options ops = new Options(arguments);
-
-        System.out.println();
-        
-        
-        // new phase 5 way/
-        /*
-        
-        if (!combineFiles(ops))
-        {
-        	return;
-        }
-        String file = "temporarycombinedfile.floyd";
-        CharStream input = CharStreams.fromFileName(file);
-        MyFloydLexer lexer = new MyFloydLexer(input, ops);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        FloydParser parser = new FloydParser(tokens);
-        // Suppress default error messages
-        parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
-        // Register my own error handler
-        parser.addErrorListener(new MyFloydErrorListener(ops));
-        
-        ParseTree tree = parser.start();
-        File f = new File("temporarycombinedfile.floyd");
-        //f.delete();
-        if (ops.getDPstatus())
-        {
-        	// Display graphical tree
-            Trees.inspect(tree, parser);
-        }         
-        Integer totalErrors = 0;
-        totalErrors =  lexer.numLexicalErrors + parser.getNumberOfSyntaxErrors();
-        //System.out.println(totalErrors + " errors found");
-        if (totalErrors == 0)
-        {
-        	
-        	SemanticChecker spider = new SemanticChecker(ops);
-        	ParseTreeWalker.DEFAULT.walk(spider, tree);
-        	totalErrors = spider.numErrors;
-        	if (totalErrors != 0)
-        	{
-            	System.out.println(totalErrors + " errors found");
-
-        	}
-        	else 
-        	{     		
-        		// compile
-        		CodeGen generator = new CodeGen(ops);
-        		generator.visit(tree);
-        		if(ops.getS())
-        		{
-        			// output to file but don't invoke gcc
-        			if (generator.checkForGap())
-        			{
-        				generator.sortInstructions();
-        			}
-            		generator.outputAssembly();
-
-        		}
-        		else
-        		{
-        			// output to file AND invoke gcc
-        			if (generator.checkForGap())
-        			{
-        				generator.sortInstructions();
-        			}
-            		generator.outputAssembly();
-            		String fileName = ops.getFileNames().get(1);
-            		fileName = fileName.replace(".floyd", ".s");
-            		String stdLib = "stdlib.c";
-
-            		String exeName = "-o" + fileName.replace(".s", "");
-            		ProcessBuilder gccLauncher = new ProcessBuilder("gcc", "-m32", fileName, stdLib, exeName );
-            		Process gcc = gccLauncher.start();
-            		int code = gcc.waitFor();
-            		if (code != 0)
-            		{
-            			System.out.println("COULD NOT COMPILE-- BOOM!");
-            		}
-            		
-        			
-        		}
-        		
-        		
-        	}
-        	
-
-        }
-        else 
-        {
-        	System.out.println(totalErrors + " errors found");
-        }
-        */
-        
-        
-        // old way
-        
-        for (String file: ops.getFileNames())
+	// This method does all the work of compiling so that I can have a small tidy Main method.	
+	public static void compile(Options ops) throws IOException, InterruptedException
+	{
+		for (String file: ops.getFileNames())
         {
         	if (!file.equals("stdlib.floyd"))
         	{
@@ -177,7 +83,6 @@ public class Main
                 }         
                 Integer totalErrors = 0;
                 totalErrors =  lexer.numLexicalErrors + parser.getNumberOfSyntaxErrors();
-                //System.out.println(totalErrors + " errors found");
                 if (totalErrors == 0)
                 {
                 	SemanticChecker spider = new SemanticChecker(ops);
@@ -237,6 +142,20 @@ public class Main
             
         
         }
+	}
+	
+	
+    public static void main(String[] arguments) throws IOException, InterruptedException {
+        Options ops = new Options(arguments);
+
+        System.out.println();
+        
+        compile(ops);
+        
+        
+       
+        
+        
     }
     
     

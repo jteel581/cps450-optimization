@@ -25,7 +25,6 @@ public class Options
         ds = false;
         dp = false;
         S = false;
-        //filenames.add("stdlib.floyd");
         if (arguments.length < 1)
         {
             System.out.println("usage:");
@@ -93,10 +92,14 @@ public class Options
     
     private boolean S = false;
 
+    
+    // This is a getter method for the S variable
 	public boolean getS() {
 		return S;
 	}
 
+	
+	// This is a setter method for the S variable;
 	public void setS(boolean s) {
 		S = s;
 	}

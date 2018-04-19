@@ -9,7 +9,6 @@ public class Symbol {
 	MethodDecl methodDecl;
 	VarDecl varDecl;
 	ClassDecl classDecl;
-	//Type attributes = new Type();
 	
 	// This is a getter method for the 'scopeNum'
 	// variable that every Symbol has. It returns

@@ -74,7 +74,6 @@ public class SymbolTable {
 	}
 	public Symbol push(String name, MethodDecl decl)
 	{
-		//System.out.println("pushing " + name);
 		Symbol s = new Symbol();
 		s.setName(name);
 		s.setScopeNum(getScope());
@@ -85,7 +84,6 @@ public class SymbolTable {
 	}
 	public Symbol push(String name, ClassDecl decl)
 	{
-		//System.out.println("pushing " + name);
 		Symbol s = new Symbol();
 		s.setName(name);
 		s.setScopeNum(getScope());

@@ -9,6 +9,8 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
 public class MyFloydErrorListener extends ConsoleErrorListener {
+	
+	// This is a constructor for the MyFloydErrorListener class
 	MyFloydErrorListener(Options ops)
 	{
 		options = ops;
@@ -17,7 +19,7 @@ public class MyFloydErrorListener extends ConsoleErrorListener {
 	Options options;
 
 	// This overrides the current syntaxError method to use our own error
-	// reporting standars. It also prints a stack trace if the -dp option
+	// reporting standards. It also prints a stack trace if the -dp option
 	// is entered.
 	@Override
 	public void syntaxError(Recognizer<?, ?> recognizer,

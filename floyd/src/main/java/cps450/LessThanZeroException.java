@@ -5,9 +5,6 @@ package cps450;
 
 public class LessThanZeroException extends RuntimeException {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	// This method is used to print a message when the 
 	// LessThanZeroException is thrown.

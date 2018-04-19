@@ -1,3 +1,5 @@
+// SemanticChecker.java
+// This file holds the SemanticChecker class and all  it's logic
 package cps450;
 
 import java.util.ArrayList;
@@ -40,9 +42,7 @@ import cps450.FloydParser.NybbleBbyteContext;
 import cps450.FloydParser.OrExpressionContext;
 import cps450.FloydParser.ParanNanotermContext;
 import cps450.FloydParser.ParenthesizedExpressionContext;
-//import cps450.FloydParser.ReadIntCallContext;
 import cps450.FloydParser.RegTypeContext;
-//import cps450.FloydParser.RegularCallContext;
 import cps450.FloydParser.RegularExprTailContext;
 import cps450.FloydParser.RegularMicrotermContext;
 import cps450.FloydParser.RegularNanotermContext;
@@ -51,7 +51,6 @@ import cps450.FloydParser.TermNybbleContext;
 import cps450.FloydParser.UnaryOpExpressionMicrotermContext;
 import cps450.FloydParser.UnaryOpRegularMicrotermContext;
 import cps450.FloydParser.Var_declContext;
-//import cps450.FloydParser.WriteIntCallContext;
 
 public class SemanticChecker extends FloydBaseListener {
 	Options ops;
@@ -64,6 +63,7 @@ public class SemanticChecker extends FloydBaseListener {
 	Integer localOffset = -8;
 	Integer instanceVarOffset = 8;
 	
+	// This is a constructor for the SemanticChecker class
 	public SemanticChecker(Options ops) {
 		super();
 		this.ops = ops;
@@ -77,36 +77,29 @@ public class SemanticChecker extends FloydBaseListener {
 	@Override
 	public void exitArgument_decl(Argument_declContext ctx) {
 		String name = ctx.IDENTIFIER().getText();
-		//System.out.println("name is " + name);
-		String typeStr; // = ctx.type().getText();
+		String typeStr;
 		Type t;
 		if (ctx.type().ttype == Type.INT)
 		{
-			//ctx.varDeclType = Type.INT;
 			t = Type.INT;
 			typeStr = "int";
 		}
 		else if (ctx.type().ttype == Type.STRING)
 		{
-			//ctx.varDeclType = Type.STRING;
 			t = Type.STRING;
 			handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
 			typeStr = "string";
 		}
 		else if (ctx.type().ttype == Type.BOOLEAN)
 		{
-			//ctx.varDeclType = Type.BOOLEAN;
 			t = Type.BOOLEAN;
 			typeStr = "boolean";
 		}
 		else 
 		{
-			//ctx.varDeclType = Type.ERROR;
 			t = Type.ERROR;
 			typeStr = "<error>";
 		}
-		//System.out.println("type is " + typeStr);
-		//Type t = new Type(typeStr);
 		VarDecl decl = new VarDecl(t, name);
 		st.push(name, decl);
 		ctx.sym = st.lookup(name);
@@ -117,10 +110,8 @@ public class SemanticChecker extends FloydBaseListener {
 
 	@Override
 	public void exitVar_decl(Var_declContext ctx) {
-		//System.out.println("exiting statement: " + ctx.getText());
 		String name = ctx.IDENTIFIER().getText();
-		//System.out.println("name is " + name);
-		String typeStr; // = ctx.type().getText();
+		String typeStr; 
 		Type t;
 		if (ctx.type() != null)
 		{
@@ -150,8 +141,6 @@ public class SemanticChecker extends FloydBaseListener {
 				t = ctx.varDeclType;
 				typeStr = ctx.type().getText();
 			}
-			//System.out.println("type is " + typeStr);
-			//Type t = new Type(typeStr);
 			VarDecl decl = new VarDecl(t, name);
 			if (st.getScope() == 2)
 			{
@@ -177,7 +166,6 @@ public class SemanticChecker extends FloydBaseListener {
 			else
 			{
 				handyMan.reportError(fileName, ctx, SemanticError.REDECLAREDVAR);
-				//System.out.println("89");
 			}
 			s = st.lookup(name);
 			ctx.sym = s;
@@ -194,14 +182,12 @@ public class SemanticChecker extends FloydBaseListener {
 		}
 		
 		
-		//System.out.print(st.toString());
 	}
 	
 
 	@Override
 	public void enterAssignment_stmt(Assignment_stmtContext ctx) {
 		
-		//System.out.print("st on assignment of var " + ctx.IDENTIFIER().getText() + " is\n" + st.toString());
 		super.enterAssignment_stmt(ctx);
 	}
 
@@ -209,9 +195,7 @@ public class SemanticChecker extends FloydBaseListener {
 
 	@Override
 	public void exitAssignment_stmt(Assignment_stmtContext ctx) {
-		//System.out.println("exiting statement: " + ctx.getText());
 		String name = ctx.IDENTIFIER().getText();
-		//System.out.println("parent of assignment " + name + " is " + ctx.getParent().getText());
 		Symbol s = st.lookup(name);
 		ctx.sym = s;
 
@@ -236,12 +220,21 @@ public class SemanticChecker extends FloydBaseListener {
 				symbolType = s.classDecl.type;
 			}
 			Type varType = ctx.e2.exprType;
-			//System.out.println("symbolType is " + symbolType.name);
 			if ((varType != symbolType) && (symbolType != Type.ERROR))
 			{
-				if (symbolType == null)
+				if (symbolType == null && varType != null)
 				{
 					handyMan.reportError(fileName, ctx, SemanticError.TYPEMISMATCH, "null", varType.toString());
+
+				}
+				else if (varType == null && symbolType != null)
+				{
+					handyMan.reportError(fileName, ctx, SemanticError.TYPEMISMATCH, symbolType.toString(), "null");
+
+				}
+				else if (varType == null && symbolType == null)
+				{
+					handyMan.reportError(fileName, ctx, SemanticError.TYPEMISMATCH, "null", "null");
 
 				}
 				else if (!varType.name.equals(symbolType.name))
@@ -250,7 +243,6 @@ public class SemanticChecker extends FloydBaseListener {
 
 				}
 			}
-			//System.out.println("varType is " + varType.name);
 			
 		}
 	}
@@ -261,7 +253,6 @@ public class SemanticChecker extends FloydBaseListener {
 		{
 			if (ctx.exprtail() != null && !ctx.exprtail().getText().equals(""))
 			{
-				//hahaha
 
 				String className = ctx.IDENTIFIER().getText();
 				String methodBeingCalled = ctx.exprtail().getChild(0).getText();
@@ -301,7 +292,6 @@ public class SemanticChecker extends FloydBaseListener {
 								Integer paramsSize = params.size();
 								String paramsSizestr = paramsSize.toString();
 								ExpressionContext ec = etc.expression_list().exprs.get(0);
-								//etc.expression_list().exprs.get
 								if ((exprsSize > 0 && ec.exprType == null) && paramsSize != 0)
 								{
 									handyMan.reportError(fileName, etc, SemanticError.WRONGPARAMNUM, paramsSizestr , "0" );
@@ -314,7 +304,6 @@ public class SemanticChecker extends FloydBaseListener {
 								}
 								else if (paramsSize == 0)
 								{
-									// do nothing
 								}
 								
 								else if( exprsSize != params.size() )
@@ -439,7 +428,6 @@ public class SemanticChecker extends FloydBaseListener {
 				return;
 			}
 			
-			//handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
 		}
 		else if (ctx.NULL() != null)
 		{
@@ -494,7 +482,6 @@ public class SemanticChecker extends FloydBaseListener {
 				}
 				else
 				{
-					//symbolType = s.classDecl.type;
 					symbolType = s.classDecl.type;
 					if (ctx.exprtail() != null )
 					{
@@ -527,7 +514,6 @@ public class SemanticChecker extends FloydBaseListener {
 				}
 				else if (op.equals("not") && (symbolType == Type.BOOLEAN))
 				{
-					//System.out.println("we def made it 2.0");
 
 					ctx.exprType = symbolType;
 				}
@@ -840,9 +826,7 @@ public class SemanticChecker extends FloydBaseListener {
 
 
 	@Override
-	public void exitRegularMicroterm(RegularMicrotermContext ctx) {
-		// THIS IS WHERE THE MOST RECENT BUG IS; IT IS A PROBLEM WITH THE LOOKUP FUNCTION FOR CALL ON VARIABLE Y THAT IS REDEFINED
-		
+	public void exitRegularMicroterm(RegularMicrotermContext ctx) {		
 		
 		if (ctx.IDENTIFIER() != null)
 		{
@@ -968,14 +952,6 @@ public class SemanticChecker extends FloydBaseListener {
 	}
 
 
- /* These are to be done later
-	@Override
-	public void exitStart(StartContext ctx) {
-		//  Auto-generated method stub
-		super.exitStart(ctx);
-	}
-*/
-
 
 	@Override
 	public void exitRegType(RegTypeContext ctx) {
@@ -1041,7 +1017,6 @@ public class SemanticChecker extends FloydBaseListener {
 			Type t = Type.getTypeForName(typeName);
 			ctx.exprType = t;
 			ctx.sym = st.lookup(typeName);
-			//handyMan.reportError(ops.getFileNames().toString(), ctx, SemanticError.UNSUPPORTED);
 		
 		
 	}
@@ -1053,7 +1028,6 @@ public class SemanticChecker extends FloydBaseListener {
 	public void exitOrExpression(OrExpressionContext ctx) {
 		if (dealWithExprTail(ctx))
 		{
-			//ctx.exprType = ctx.exprtail().exprTailType;
 			Type typeOne = ctx.expression().exprType;
 			Type typeTwo = ctx.exprtail().exprTailType;
 			if (typeOne.name.equals(typeTwo.name) && typeOne.name.equals("boolean"))
@@ -1155,7 +1129,6 @@ public class SemanticChecker extends FloydBaseListener {
 
 	@Override
 	public void exitExprTailExpression(ExprTailExpressionContext ctx) {
-		//System.out.println("in expression tail expression: " + ctx.getText());
 		ctx.exprType = ctx.exprtail().exprTailType;
 		ctx.sym = ctx.exprtail().sym;
 	}
@@ -1166,13 +1139,12 @@ public class SemanticChecker extends FloydBaseListener {
 	@Override
 	public void exitRegularExprTail(RegularExprTailContext ctx) {
 		String identifier = ctx.IDENTIFIER().getText();
-		// this is the line i added in to take care of the problem
 		if(!ctx.getParent().getText().contains("."))
 		{
 			Symbol s = st.lookup(identifier);
 			if ( s != null)
 			{
-				ctx.sym = s; // sym is the method itself
+				ctx.sym = s;
 
 				Type t;
 				if (s.varDecl != null)
@@ -1183,7 +1155,6 @@ public class SemanticChecker extends FloydBaseListener {
 				{
 					t = s.methodDecl.returnType;
 					String methodBeingCalled = ctx.IDENTIFIER().getText();
-					//Symbol s = st.lookup(methodBeingCalled);
 					MethodDecl md = s.methodDecl;
 					ArrayList<String> params = md.parameters;
 					ArrayList<Type> paramTypes = md.parameterTypes;
@@ -1217,8 +1188,6 @@ public class SemanticChecker extends FloydBaseListener {
 						checkPassedParams(ctx, paramTypes);
 					}
 					ctx.sym = s;
-					//String methodName = s.methodDecl.methodName;
-					//System.out.println("METHOD IS::::::::::" + methodName);
 					ctx.exprTailType = md.returnType;			
 				} 
 				else
@@ -1230,7 +1199,6 @@ public class SemanticChecker extends FloydBaseListener {
 			else 
 			{
 				ctx.exprTailType = Type.ERROR;
-				//System.out.println("WE CAME TO THIS PLACE");
 				handyMan.reportError(fileName, ctx, SemanticError.UNDECLAREDMETHOD);
 			}
 		}
@@ -1250,9 +1218,8 @@ public class SemanticChecker extends FloydBaseListener {
 			else
 			{
 				String methodName = ctx.IDENTIFIER().getText();
-				//String className = cdx.id1.getText();
 				Symbol s = st.lookup(className);
-				ctx.sym = s; // s is the class
+				ctx.sym = s; 
 				if (s == null)
 				{
 					handyMan.reportError(fileName, ctx, SemanticError.UNSUPPORTED);
@@ -1592,17 +1559,9 @@ public class SemanticChecker extends FloydBaseListener {
 
 	@Override
 	public void exitMethod_decl(Method_declContext ctx) throws LessThanZeroException {
-		
-		
-		//System.out.println("METHODDECLARATION IS" + md.toString());
 
-		//System.out.println("Exiting methodDecl " + ctx.getText());
-		//System.out.println("Stack before method exit: \n" + st.toString());
-		
 		st.endScope();
 		localOffset = -8;
-		//System.out.println("Stack after exit: \n" + st.toString());
-		//MethodDecl md = new MethodDecl()
 		
 	}
 
@@ -1612,7 +1571,6 @@ public class SemanticChecker extends FloydBaseListener {
 		Symbol s = new Symbol();
 		s.setName(ctx.id1.getText());
 		ClassDecl cd = new ClassDecl(ctx.id1.getText(), null, null);
-		//s.classDecl = cd;
 		st.push(s.getName(), cd);
 		Type.createType(cd);
 		st.beginScope();
@@ -1638,7 +1596,6 @@ public class SemanticChecker extends FloydBaseListener {
 		inMethods.add(readIntDecl);
 		ClassDecl inClassDecl = new ClassDecl("in", inVars, inMethods);
 		st.push("in", inClassDecl);
-		//st.push("readint", readIntDecl);
 		params2.add("num");
 		paramTypes2.add(Type.INT);
 		MethodDecl writeIntDecl = new MethodDecl(Type.VOID, params2, paramTypes2);
@@ -1647,7 +1604,6 @@ public class SemanticChecker extends FloydBaseListener {
 		ClassDecl outClassDecl = new ClassDecl("out", outVars, outMethods);
 		st.push("out", outClassDecl);
 
-		//st.push("writeint", writeIntDecl);
 	}
 
 
@@ -1670,25 +1626,6 @@ public class SemanticChecker extends FloydBaseListener {
 			handyMan.reportError(fileName, ctx, SemanticError.NOSTARTMETHOD);
 		}
 		numErrors = handyMan.numErrors;
-		// old way, before allowing multiple classes
-		/*
-		if (classNum != 1)
-		{
-			if (classNum > 1)
-			{
-				Class_declContext cdc = ctx.classes.get(1);
-				handyMan.reportError(fileName, cdc, SemanticError.MORETHANONECLASS);
-			}
-			else
-			{
-				handyMan.reportError(fileName, ctx, SemanticError.MORETHANONECLASS);
-
-			}
-			
-		}
-		numErrors = handyMan.numErrors;
-		*/
-		// end old way
 	}
 
 
@@ -1722,15 +1659,12 @@ public class SemanticChecker extends FloydBaseListener {
 			{
 				type = new Type(typeStr);
 			}
-			//type = ctx.type().getText();
 
 		}
 		else 
 		{
 			type = Type.VOID;
 		}
-		//ArrayList<VarDecl> vars = new ArrayList<>();
-		//System.out.println("method type is " + type.toString());
 		String name = ctx.id1.getText();
 		
 		Symbol lookedUpSymbol = st.lookup(name);
@@ -1746,9 +1680,7 @@ public class SemanticChecker extends FloydBaseListener {
 			{
 				getParams(ctx, params, paramTypes);
 
-			}
-			//st.beginScope();
-			//System.out.println(st.toString());			
+			}		
 		}
 		else 
 		{
@@ -1766,12 +1698,6 @@ public class SemanticChecker extends FloydBaseListener {
 		
 		s.methodDecl = md;
 		ctx.sym = s;
-		//System.out.println("METHODDECLARATION IS" + md.toString());
-
-		//System.out.println("Exiting methodDecl " + ctx.getText());
-		//System.out.println("Stack before method exit: \n" + st.toString());
-		
-		//st.endScope();
 		st.push(name, s.methodDecl);
 		st.beginScope();
 	}
@@ -1849,18 +1775,9 @@ public class SemanticChecker extends FloydBaseListener {
 		Symbol s = st.lookup(className);
 		s.setName(className);
 		s.classDecl = cd;
-		
-		
-		
-		//System.out.println(cd.toString());
-
-		//System.out.println("Exiting classDecl " + ctx.getText());
-		//System.out.println("Stack before class exit: \n" + st.toString());
-		
 		st.endScope();
 		instanceVarOffset = 8;
 		st.push(className, s.classDecl);
-		//System.out.println("Stack after exit: \n" + st.toString());
 	}
 	
 	
@@ -1895,8 +1812,6 @@ public class SemanticChecker extends FloydBaseListener {
 			Symbol s = st.lookup(methodBeingCalled);
 			if (s != null)
 			{
-				//ctx.sym = s;
-
 				if (s.methodDecl != null)
 				{
 					// check for method variables
@@ -1931,17 +1846,13 @@ public class SemanticChecker extends FloydBaseListener {
 					else 
 					{
 						checkPassedParams(ctx, paramTypes);
-					}
-					//String methodName = s.methodDecl.methodName;
-					//System.out.println("METHOD IS::::::::::" + methodName);
-					
+					}					
 				}
 				else
 				{
 					
 					handyMan.reportError(fileName, ctx, SemanticError.UNDECLAREDMETHOD);
 				}
-				//ctx.returnType = 
 			}
 			else
 			{
@@ -2025,45 +1936,7 @@ public class SemanticChecker extends FloydBaseListener {
 	}
 	
 	
-	/*
-	
-	@Override
-	public void exitRegularCall(RegularCallContext ctx) {
-		String methodBeingCalled = ctx.IDENTIFIER().getText();
-		Symbol s = st.lookup(methodBeingCalled);
-		if (s != null)
-		{
-			if (s.decl.methodDecl)
-			{
-				// check for method variables
-				//if (ctx.expression_list().exprs.size())
-				ctx.returnType = s.decl.type;
-			}
-			else
-			{
-				
-				ctx.returnType = Type.ERROR;
-				handyMan.reportError(fileName, ctx, SemanticError.UNDECLAREDMETHOD);
-			}
-			//ctx.returnType = 
-		}
-		else
-		{
-			ctx.returnType = Type.ERROR;
-		}
-		
-	}
-
-	public void checkPassedParams(RegularCallContext ctx, ArrayList<String> paramsList, ArrayList<Type> typeList)
-	{
-		for (int i = 0; i < ctx.expression_list().exprs.size(); i++)
-		{
-			ExpressionContext ec = ctx.expression_list().exprs.get(i);
-			
-		}
-	}
-*/
-
+	// This method checks the parameters passed to a method to see if they are the right type
 	public boolean checkPassedParams(Call_stmtContext ctx, ArrayList<Type> typeList)
 	{
 		boolean correctParams = false;
@@ -2117,7 +1990,7 @@ public class SemanticChecker extends FloydBaseListener {
 	}
 
 
-	
+	// This one also checks the parameters passed to a method to see if they are the correct type.
 	public boolean checkPassedParams(RegularExprTailContext ctx, ArrayList<Type> typeList)
 	{
 		boolean correctParams = false;
@@ -2170,7 +2043,7 @@ public class SemanticChecker extends FloydBaseListener {
 		
 	}
 	
-
+	// This method gets the parameters from a method declaration and puts them in array lists so that they are easier to process later.
 	public void getParams(Method_declContext ctx, ArrayList<String> paramsList, ArrayList<Type> typeList)
 	{
 		if (ctx.argument_decl_list() != null)
@@ -2206,6 +2079,7 @@ public class SemanticChecker extends FloydBaseListener {
 		}
 	}
 	
+	// These methods checks to see if there is an ExprTail, and if there is it returns its type
 	private boolean dealWithExprTail(RegularMicrotermContext ctx) {
 		Type t = ctx.exprtail().exprTailType;
 		if (t == null)

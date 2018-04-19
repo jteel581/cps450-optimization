@@ -16,6 +16,7 @@ public class Type {
 	private static HashMap<String, Type> types = new HashMap<>();
 	ClassDecl classDecl;
 	
+	// This method is used to create user defined types.
 	public static Type createType(ClassDecl cd)
 	{
 		Type t = new Type(cd.className);
@@ -23,6 +24,8 @@ public class Type {
 		types.put(cd.className, t);
 		return t;
 	}
+	
+	// This method gets a type from its corresponding class name
 	
 	public static Type getTypeForName(String className)
 	{
@@ -36,10 +39,11 @@ public class Type {
 			return t;
 		}
 	}
+	
+	// This method sets a types name 
 	protected Type(String name) 
 	{
 		this.name = name;
-		//types = new HashMap<>();
 	}
 	@Override
 	public String toString() {

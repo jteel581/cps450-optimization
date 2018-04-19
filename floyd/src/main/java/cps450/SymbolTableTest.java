@@ -9,6 +9,7 @@ import org.junit.Test;
 
 public class SymbolTableTest {
 
+	// This method tests the symbol table
 	@Test
 	public void testSymbolTable() throws LessThanZeroException {
 		SymbolTable t = SymbolTable.getInstance();

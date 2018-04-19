@@ -1,3 +1,6 @@
+// SemanticErrorHandler.java
+// This file holds the SemanticErrorHandler class which handles the different semantic errors within
+// a given program.s
 package cps450;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -29,6 +32,7 @@ public class SemanticErrorHandler {
 	String noSuchMethodInClassMessage = "No such method for ";
 	String noStartMethodMessage = "The last class defined does not contain a start method.";
 
+	// This is a constructor for the SemanticErrorHandler class
 	public SemanticErrorHandler() {
 		super();
 		this.error = null;
@@ -42,6 +46,8 @@ public class SemanticErrorHandler {
 		this.typeTwo = "";
 		
 	}
+	
+	// These methods are used to report the different errors encountered by printing them to standard out.
 	public void reportError(String fileName, ParserRuleContext ctx, SemanticError error, String strOne, String strTwo)
 	{
 		this.error = error;
@@ -107,7 +113,6 @@ public class SemanticErrorHandler {
 		
 		System.out.println(fullMessage);
 		numErrors++;
-		//System.out.print(SymbolTable.getInstance().toString());
 	}
 	
 	public void reportError(String fileName, ParserRuleContext ctx, SemanticError error)
@@ -158,9 +163,9 @@ public class SemanticErrorHandler {
 		System.out.println(fullMessage);
 		numErrors++;
 
-		//System.out.print(SymbolTable.getInstance().toString());
 
 	}
+	
 	public void reportError(String fileName, TerminalNode assignment) {
 		this.fileName = fileName;
 		line = assignment.getSymbol().getLine();

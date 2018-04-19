@@ -1,3 +1,5 @@
+// MethodDecl.java
+// This file holds the MethodDecl class which inherits from the Declaration class.
 package cps450;
 
 import java.util.ArrayList;
@@ -12,6 +14,8 @@ public class MethodDecl extends Declaration {
 	ArrayList<Type> parameterTypes;
 	Map<String, Integer> offsets;
 	Integer offSet;
+	
+	// This is a constructor for the MethodDecl class
 	public MethodDecl(Type returnType, ArrayList<String> parameters, ArrayList<Type> parameterTypes) {
 		super(returnType);
 		this.returnType = returnType;
@@ -23,6 +27,8 @@ public class MethodDecl extends Declaration {
 		this.setUpOffsets();
 		
 	}
+	
+	// This method sets the offsets for the different parameters of a method
 	private void setUpOffsets()
 	{
 		Integer offSet = 8;
@@ -38,6 +44,7 @@ public class MethodDecl extends Declaration {
 		return offsets;
 	}
 	
+	// This is a getter method that gets an offset given the name of the parameter
 	public Integer getOffSet(String key)
 	{
 		Integer offSet = 0;
