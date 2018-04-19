@@ -6,7 +6,7 @@
 
 #### Time Spent: 30 hours
 #### Level Attempted B level 
- - (Implimented all of C level, and multiple user defined classes, dynamically allocated memory for instance variables, object instantiation, null, and me expressions)
+ - Implimented all of C level, and multiple user defined classes, dynamically allocated memory for instance variables, object instantiation, null, and me expressions
 #### DID NOT DO: run time null pointer exceptions, support for string types
 #### Known Bugs: 
 	- My program does not use the stdlib.floyd file since I do not support strings so some tests for the B version may not come out correct, but the object instantiation test file does pass. 
